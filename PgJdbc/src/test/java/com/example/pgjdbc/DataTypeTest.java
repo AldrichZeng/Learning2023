@@ -12,8 +12,11 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.postgresql.jdbc.PgResultSetMetaData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author 匠承
@@ -28,6 +31,7 @@ public class DataTypeTest {
 
     @Before
     public void init() {
+        //?binaryTransferEnable=BIT
         String url = "jdbc:postgresql://pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com:5432/jctest";
         String user = "jctest";
         String password = "DWzengyao1234";
@@ -36,7 +40,7 @@ public class DataTypeTest {
             Class.forName("org.postgresql.Driver");
             // 建立连接
             conn = DriverManager.getConnection(url, user, password);
-            logger.info("Connect successfully!");
+            logger.info("Connect successfully! DB: {}, Driver: {} {}.", conn.getMetaData().getDatabaseProductName(), conn.getMetaData().getDriverName(), conn.getMetaData().getDriverVersion());
             stmt = conn.createStatement();
         } catch (Exception e) {
             e.printStackTrace();
@@ -123,7 +127,7 @@ public class DataTypeTest {
         stmt.executeUpdate(sql);
 
         sql = "INSERT INTO public.my_test (bit_col) " +
-                "VALUES (null), (b'00000000'), (b'00000001'), (b'00000010'), (b'00000011'), "
+                "VALUES (null), ('t'), (b'00000001'), (b'00000010'), (b'00000011'), "
                 + "(b'00000100'), (b'00000101'), (b'00000110'), (b'00000111')";
         stmt.executeUpdate(sql);
 
@@ -131,17 +135,26 @@ public class DataTypeTest {
         rs = stmt.executeQuery(sql);
 
         ResultSetMetaData resultSetMetaData = rs.getMetaData();
+        logger.info("resultSetMetaData: {}",resultSetMetaData.getSchemaName(1));
+        if(resultSetMetaData instanceof PgResultSetMetaData){
+
+        }
+
         Assert.assertEquals(resultSetMetaData.getColumnType(1), Types.BIT);
         // 处理结果
         while (rs.next()) {
             for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
                 // pg9.x和pg42.x表现不同
-                logger.info("Column_{} Row_{}, getBoolean: {}, getString: {}. ",
-                        i, rs.getRow(), rs.getBoolean(i), rs.getString(i));
+                logger.info("Column_{} Row_{}, getBoolean: {}, getString: {}, getBytes: {}.",
+                        i, rs.getRow(), rs.getBoolean(i), rs.getString(i), rs.getBytes(i));
             }
             //for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
             //    logger.info("Column_{} Row_{}, getString: {}. toBoolean: {}.",
-            //            i, rs.getRow(), rs.getString(i), toBoolean(rs.getString(i)));
+            //            i, rs.getRow(), rs.getString(i), this.toBoolean(rs.getString(i)));
+            //}
+            //for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++){
+            //    logger.info("Column_{} Row_{}, getString: {}. getBytes: {}.",
+            //            i, rs.getRow(), rs.getString(i), rs.getBytes(i));
             //}
         }
         logger.info("end");
@@ -164,11 +177,16 @@ public class DataTypeTest {
         Assert.assertEquals(Double.parseDouble("00000101"), 101.0, 2);
         Assert.assertEquals(Double.parseDouble("00000110"), 110.0, 2);
         Assert.assertEquals(Double.parseDouble("00000111"), 111.0, 2);
+        try{
+            Double.parseDouble(null);
+            fail();
+        }catch(Exception e){
+        }
     }
 
     @Test
-    public void test5() {
-
+    public void test(){
+        System.out.println(Boolean.parseBoolean("01010"));
     }
 
     @After
@@ -187,5 +205,36 @@ public class DataTypeTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void testBoolean() throws SQLException {
+        String sql = "drop table if exists public.my_test";
+        stmt.executeUpdate(sql);
+        sql = "CREATE TABLE public.my_test " +
+                "(bool_col bool, boolean_col boolean, bit_col bit(2))";
+        stmt.executeUpdate(sql);
+
+        sql = "INSERT INTO public.my_test (bool_col, boolean_col, bit_col) " +
+                "VALUES (true, true, b'10'), (false, false, '01'), (null,null, b'00')";
+        stmt.executeUpdate(sql);
+
+        sql = "select * from public.my_test";
+        rs = stmt.executeQuery(sql);
+
+        ResultSetMetaData resultSetMetaData = rs.getMetaData();
+        logger.info("Column Type: {}. java.sql.Types.BIT: {}. {} ", resultSetMetaData.getColumnType(1), Types.BIT, resultSetMetaData.getColumnTypeName(1));
+        logger.info("Column Type: {}. java.sql.Types.BIT: {}. {}", resultSetMetaData.getColumnType(2), Types.BIT, resultSetMetaData.getColumnTypeName(2));
+        logger.info("Column Type: {}. java.sql.Types.BIT: {}. {}", resultSetMetaData.getColumnType(3), Types.BIT, resultSetMetaData.getColumnTypeName(3));
+        System.out.println();
+        // 处理结果
+        while (rs.next()) {
+            for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+                // pg9.x和pg42.x表现不同
+                logger.info("Column_{} Row_{}, getBoolean: {}, getString: {}. ",
+                        i, rs.getRow(), rs.getBoolean(i), rs.getString(i));
+            }
+        }
+        logger.info("end");
     }
 }
