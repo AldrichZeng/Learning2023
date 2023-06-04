@@ -2,15 +2,89 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
-    "name": {
-      "type": "string"
+    "needToCreateOdpsProject": {
+      "type": "boolean",
+      "description": "是否创建引擎"
     },
-    "age": {
-      "type": "integer"
+    "project": {
+      "type": "string",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
+      "description": "MC项目名"
     },
-    "hello": {
-      "type": "integer"
+    "isDefault": {
+      "type": "boolean",
+      "default": false
+    },
+    "envType": {
+      "type": "string",
+      "pattern": "^(DEV|PRD)$",
+      "description": "生产环境(PRD)或开发环境(DEV)，仅允许匹配DEV、PRD"
+    },
+    "taskAuthType": {
+      "type": "string",
+      "description": "访问身份",
+      "enum": [
+        "STS_ROLE",
+        "PROJECT",
+        "SUBACCOUNT",
+        "USER"
+      ]
+    },
+    "resourceGroupName": {
+      "type": "string",
+      "description": "Quota组"
+    },
+    "mode": {
+      "type": "string",
+      "default": "SHARE",
+      "description": "付费方式"
+    },
+    "region": {
+      "type": "string",
+      "description": "地域"
+    },
+    "accrossAliyunAccount": {
+      "type": "string",
+      "description": "对方阿里云主账号"
+    },
+    "taskSubmitter": {
+      "type": "string",
+      "description": "子账号或RAM角色"
+    },
+    "mcEncryptEnabled": {
+      "type": "integer",
+      "default": 0,
+      "minimum": 0,
+      "maximum": 1,
+      "description": "是否开启加密"
+    },
+    "mcEncryptKey": {
+      "type": "string",
+      "description": "密钥"
+    },
+    "mcEncryptAlgorithm": {
+      "type": "string",
+      "description": "加密算法"
+    },
+    "odpsTypeMode": {
+      "type": "string",
+      "description": "数据类型",
+      "default": "STANDARD"
+    },
+    "mcEndpoint": {
+      "type": "string",
+      "description": "MaxCompute Endpoint，高级配置"
+    },
+    "tunnelEndpoint": {
+      "type": "string",
+      "description": "Tunnel Endpoint，高级配置"
     }
   },
-  "required": ["name", "age"]
+  "required": [
+    "needToCreateOdpsProject",
+    "project",
+    "envType",
+    "taskAuthType",
+    "resourceGroupName"
+  ]
 }

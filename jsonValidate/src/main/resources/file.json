@@ -1,6 +1,18 @@
 {
-  "name": "Tom",
-  "age": 20,
-  "hello": 3,
-  "a": 1
+  "needToCreateOdpsProject": false,
+  "project": "jc_odps_dev",
+  "envType": "PRD",
+  "taskAuthType": "STS_ROLE",
+  "taskSubmitter": "ROLE_326100571024864577",
+  "resourceGroupName": "aliyun_group_ay20",
+  "mode": "SHARE",
+  "region": "cn-shanghai",
+  "accrossAliyunAccount": "",
+  "mcEncryptEnabled": 1,
+  "mcEncryptKey": "DEFAULT",
+  "mcEncryptAlgorithm": "AESCTR",
+  "odpsTypeMode": "STANDARD",
+  "mcEndpoint": "...",
+  "tunnelEndpoint": "...",
+  "isDefault": true
 }
