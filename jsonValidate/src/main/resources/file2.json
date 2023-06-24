@@ -1,7 +1,6 @@
 {
   "envType": "PRD",
   "taskAuthType": "PROJECT",
-  "taskSubmitter": "",
   "project": "jc_odps_dev",
   "region": "cn-shanghai",
   "projectCreateOption": {
