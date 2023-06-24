@@ -5,6 +5,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>FlinkLearning</module>
+        <module>DebeziumLearning</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
