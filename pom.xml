@@ -6,6 +6,7 @@
     <modules>
         <module>FlinkLearning</module>
         <module>DebeziumLearning</module>
+        <module>PgBulkInsert</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

@@ -53,7 +53,7 @@ public class JsonValidateTest {
 
         // 将要验证的Json数据转换为JsonNode对象
         ObjectMapper objectMapper = new ObjectMapper();
-        InputStream inputStream = this.getClass().getResourceAsStream("/file.json");
+        InputStream inputStream = this.getClass().getResourceAsStream("/file2.json");
         Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
 
         String jsonString = scanner.hasNext() ? scanner.next() : "";
@@ -65,6 +65,7 @@ public class JsonValidateTest {
         for (ValidationMessage validationMessage : set) {
             System.out.println(validationMessage);
         }
+        Assert.assertTrue(set.isEmpty());
     }
 
     String jsonSchemaPattern = "{\n"
