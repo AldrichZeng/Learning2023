@@ -1,14 +1,17 @@
 package com.zy;
 
+import java.time.Duration;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import io.debezium.engine.ChangeEvent;
 import io.debezium.engine.DebeziumEngine;
 import io.debezium.engine.format.Json;
+import io.debezium.engine.spi.OffsetCommitPolicy;
 
 /**
  * @author 匠承
@@ -40,7 +43,8 @@ public class Main {
         props.setProperty("connector.class", "io.debezium.connector.postgresql.PostgresConnector");
         DebeziumEngine<ChangeEvent<String, String>> engine = DebeziumEngine.create(Json.class)
                 .using(props)
-                .notifying(record -> System.out.println("zengyao log: " + record))
+                .using(new MyOffsetCommitPolicy())
+                .notifying(new MyConsumer())
                 .build();
         ExecutorService debeziumExecutor = new ThreadPoolExecutor(
                 1,
@@ -49,5 +53,27 @@ public class Main {
                 TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>());
         debeziumExecutor.execute(engine);
+    }
+
+    public static class MyOffsetCommitPolicy implements OffsetCommitPolicy {
+        public boolean performCommit(long numberOfMessagesSinceLastCommit, Duration timeSinceLastCommit) {
+            System.out.println("numberOfMessagesSinceLastCommit: " + numberOfMessagesSinceLastCommit);
+            System.out.println("timeSinceLastCommit: " + timeSinceLastCommit.getSeconds());
+            if (timeSinceLastCommit.getSeconds() > 30) {
+                System.out.println("commit");
+                return true;
+            } else {
+                System.out.println("not commit");
+                return false;
+            }
+        }
+    }
+
+    public static class MyConsumer implements Consumer<ChangeEvent<String, String>> {
+
+        public void accept(ChangeEvent<String, String> stringStringChangeEvent) {
+            String value = stringStringChangeEvent.value();
+            System.out.println("GET " + value);
+        }
     }
 }
