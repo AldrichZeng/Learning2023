@@ -5,6 +5,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>PgBulkInsert</module>
+        <module>UrlEncodeLearning</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
