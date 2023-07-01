@@ -4,6 +4,8 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
     <modules>
+        <module>FlinkLearning</module>
+        <module>DebeziumLearning</module>
         <module>PgBulkInsert</module>
         <module>UrlEncodeLearning</module>
     </modules>
