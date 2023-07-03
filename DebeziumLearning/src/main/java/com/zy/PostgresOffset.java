@@ -13,6 +13,9 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Map;
 
+/**
+ * 实际上该类并未被用到
+ */
 public class PostgresOffset {
 
     private static final Logger logger = LoggerFactory.getLogger(PostgresOffset.class);
@@ -24,6 +27,7 @@ public class PostgresOffset {
     }
 
     public PostgresPosition fromLSN(String engineName, Lsn lsn) throws SQLException, IOException {
+        logger.info("fromLSN");
         final String PARTITION_KEY = "server";
 
         Map<String, String> partition = Collections.singletonMap(PARTITION_KEY, engineName);

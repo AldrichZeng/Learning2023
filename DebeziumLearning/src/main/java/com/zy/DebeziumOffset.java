@@ -3,10 +3,6 @@ package com.zy;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author yubing.lyb@（十禹）
- * @date 2021/5/18 2:18 下午
- */
 public class DebeziumOffset {
 
     public Map<String, ?> sourcePartition;

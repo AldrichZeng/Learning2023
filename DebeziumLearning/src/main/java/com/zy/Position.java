@@ -9,6 +9,9 @@ import com.alibaba.fastjson.JSON;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * 用于序列化
+ */
 public abstract class Position implements Serializable {
     private static final long serialVersionUID = 8323108727124862243L;
 

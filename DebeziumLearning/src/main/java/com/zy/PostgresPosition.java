@@ -1,19 +1,22 @@
 
 package com.zy;
 
-import com.alibaba.fastjson.JSON;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
- * Different Debezium connectors have different format
+ * 不同的Debezium连接器具有不同的格式
  */
 public class PostgresPosition extends Position {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * Key: Engine name host:name:db
@@ -21,12 +24,11 @@ public class PostgresPosition extends Position {
      */
     private Map<String, LinkedList<DebeziumOffset>> engineWindows;
     private Map<String, DebeziumOffset> enginePostions;
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    /* For JavaBean*/
     public Map<String, LinkedList<DebeziumOffset>> getEngineWindows() {
         return this.engineWindows;
     }
+
     public void setEngineWindows(Map<String, LinkedList<DebeziumOffset>> engineWindows) {
         this.engineWindows = engineWindows;
     }
@@ -53,11 +55,12 @@ public class PostgresPosition extends Position {
         this.enginePostions = new HashMap<>();
         this.engineWindows = new HashMap<>();
         this.enginePostions.put(engineName, new DebeziumOffset(sourcePartition, sourceOffset));
-        this.engineWindows.put(engineName, (LinkedList<DebeziumOffset>)postionWindow.clone());
+        this.engineWindows.put(engineName, (LinkedList<DebeziumOffset>) postionWindow.clone());
     }
 
     @Override
     public String merge(List<String> positions) {
+        logger.info("PostgresPosition merge.");
 
         PostgresPosition mergedPosition = new PostgresPosition();
 
@@ -69,7 +72,6 @@ public class PostgresPosition extends Position {
             for (Map.Entry<String, LinkedList<DebeziumOffset>> enginePosition : position.engineWindows.entrySet()) {
                 if (!mergedPosition.engineWindows.containsKey(enginePosition.getKey())) {
                     mergedPosition.engineWindows.put(enginePosition.getKey(), enginePosition.getValue());
-
                 } else {
                     DebeziumOffset existedOffset = mergedPosition.engineWindows.get(enginePosition.getKey()).getLast();
                     DebeziumOffset newOffset = enginePosition.getValue().getLast();
@@ -83,7 +85,6 @@ public class PostgresPosition extends Position {
             for (Map.Entry<String, DebeziumOffset> enginePosition : position.enginePostions.entrySet()) {
                 if (!mergedPosition.enginePostions.containsKey(enginePosition.getKey())) {
                     mergedPosition.enginePostions.put(enginePosition.getKey(), enginePosition.getValue());
-
                 } else {
                     DebeziumOffset existedOffset = mergedPosition.enginePostions.get(enginePosition.getKey());
                     DebeziumOffset newOffset = enginePosition.getValue();
@@ -120,5 +121,4 @@ public class PostgresPosition extends Position {
         }
         return this.engineWindows.get(engineName);
     }
-
 }
