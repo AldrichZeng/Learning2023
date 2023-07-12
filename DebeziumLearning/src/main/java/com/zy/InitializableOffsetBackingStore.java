@@ -31,18 +31,18 @@ public class InitializableOffsetBackingStore extends MemoryOffsetBackingStore {
 
     @Override
     public void configure(WorkerConfig config) {
-        logger.info("===config:{}", config);
+        logger.info("InitializableOffsetBackingStore正在读取配置: {}", config);
         super.configure(config);
 
         // This serialized data is the raw position data, which is serialized by FastJson
         // Deserialize it will give a PostgresPosition object
         String serializedPosition = (String) config.originals().get(OFFSET_INITIAL_POSITION_JSON);
         if (serializedPosition == null) {
-            logger.info("No initial offset was set");
+            logger.info("No initial offset was set，这是不符合预期的");
             return;
         }
 
-        // 序列化
+        logger.info("序列化initialPosition，原始字符串：{}", serializedPosition);
         PostgresPosition initialPosition = JSON.parseObject(serializedPosition, PostgresPosition.class);
 
         // Construct converters and offsetWriter
@@ -59,8 +59,8 @@ public class InitializableOffsetBackingStore extends MemoryOffsetBackingStore {
 
         // Write offset
         try {
-            logger.info("sourcePartition: {}.", initialPosition.getSourcePartition(engineName));
-            logger.info("sourceOffset: {}.", initialPosition.getSourceOffset(engineName));
+            logger.info("初始化位点 sourcePartition: {}.", initialPosition.getSourcePartition(engineName));
+            logger.info("初始化位点 sourceOffset: {}.", initialPosition.getSourceOffset(engineName));
             offsetWriter.offset(initialPosition.getSourcePartition(engineName), initialPosition.getSourceOffset(engineName));
         } catch (Exception e) {
             logger.warn("Cannot write offset to InitialOffsetBackingStore. Configurations might be changed after last checkpoint. Ignoring offset initialization. ", e);
@@ -84,7 +84,7 @@ public class InitializableOffsetBackingStore extends MemoryOffsetBackingStore {
                 if (error != null) {
                     logger.error("Failed to flush initial offset", error);
                 } else {
-                    logger.trace("Successfully flush initial offset");
+                    logger.info("Successfully flush initial offset");
                 }
             }
         });
@@ -110,8 +110,4 @@ public class InitializableOffsetBackingStore extends MemoryOffsetBackingStore {
 
     }
 
-    @Override
-    protected void save() {
-        logger.info("save in Intializable Offset Backing Store, but do nothing");
-    }
 }

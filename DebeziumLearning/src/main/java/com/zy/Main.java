@@ -1,5 +1,10 @@
 package com.zy;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
@@ -16,8 +21,10 @@ import io.debezium.engine.ChangeEvent;
 import io.debezium.engine.DebeziumEngine;
 import io.debezium.engine.format.Json;
 import io.debezium.engine.spi.OffsetCommitPolicy;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 
 /**
  * @author 匠承
@@ -26,7 +33,21 @@ import org.slf4j.LoggerFactory;
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-    public static void main(String[] args) {
+    public static int confirm_interval_second = 10;
+
+    public static void main(String[] args) throws IOException {
+        ClassPathResource classPathResource = new ClassPathResource("startPosition.json");
+        InputStream inputStream = classPathResource.getInputStream();
+        BufferedReader  br = new BufferedReader(new InputStreamReader(inputStream));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while((line = br.readLine())!=null){
+            sb.append(line);
+        }
+        String initialPosition = sb.toString();
+        br.close();
+
+
         Properties props = new Properties();
         props.setProperty("snapshot.mode", "never");
         props.setProperty("database.user", "jctest");
@@ -52,7 +73,8 @@ public class Main {
         props.setProperty("offset.storage", "com.zy.InitializableOffsetBackingStore");
         props.setProperty("database.server.name", "pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com_jctest_di_slot");
         props.setProperty("publication.autocreate.mode", "filtered");
-        props.setProperty("offset.initial.position.json", "{\"enginePostions\":{\"pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com_jctest_di_slot\":{\"sourceOffset\":{\"ts_usec\":0,\"lsn\":02},\"sourcePartition\":{\"server\":\"pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com_jctest_di_slot\"}}}}");
+        // 从哪个位点开始读
+        props.setProperty("offset.initial.position.json", initialPosition);
         props.setProperty("connector.class", "io.debezium.connector.postgresql.PostgresConnector");
         DebeziumEngine<ChangeEvent<String, String>> engine = DebeziumEngine.create(Json.class)
                 .using(props)
@@ -71,8 +93,8 @@ public class Main {
     public static class MyOffsetCommitPolicy implements OffsetCommitPolicy {
         public boolean performCommit(long numberOfMessagesSinceLastCommit, Duration timeSinceLastCommit) {
             logger.info("numberOfMessagesSinceLastCommit: " + numberOfMessagesSinceLastCommit + "\ttimeSinceLastCommit: " + timeSinceLastCommit.getSeconds());
-            // 定义超过30秒则提交LSN
-            if (timeSinceLastCommit.getSeconds() > 30) {
+            // 定义超过多长时间则confirm LSN
+            if (timeSinceLastCommit.getSeconds() > confirm_interval_second) {
                 logger.info("commit LSN");
                 return true;
             } else {
@@ -86,7 +108,7 @@ public class Main {
 
         public void accept(ChangeEvent<String, String> stringStringChangeEvent) {
             String value = stringStringChangeEvent.value();
-            logger.info("GET changeEvent: \n" + JSONFormat(value));
+            logger.info("读取到变更: \n" + JSONFormat(value));
         }
     }
 

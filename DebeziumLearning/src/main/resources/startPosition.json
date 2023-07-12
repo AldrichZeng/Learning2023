@@ -1,0 +1,13 @@
+{
+  "enginePostions": {
+    "pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com_jctest_di_slot": {
+      "sourceOffset": {
+        "ts_usec": 0,
+        "lsn": 1160647847456
+      },
+      "sourcePartition": {
+        "server": "pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com_jctest_di_slot"
+      }
+    }
+  }
+}
