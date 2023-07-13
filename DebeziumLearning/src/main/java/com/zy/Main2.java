@@ -1,35 +1,26 @@
 package com.zy;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import io.debezium.engine.ChangeEvent;
 import io.debezium.engine.DebeziumEngine;
 import io.debezium.engine.format.Json;
-import io.debezium.engine.spi.OffsetCommitPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author 匠承
- * @Date: 2023/6/24 14:33
+ * @Date: 2023/7/13 10:18
  */
-public class Main {
-    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+public class Main2 {
+    private static final Logger logger = LoggerFactory.getLogger(Main2.class);
 
-    public static int confirm_interval_second = 600;
-
-    public static String lsnInHex = "10E/5F004F90";
+    public static String lsnInHex = "10E/BE0BD400";
     public static String lsnInDec = Utils.lsnHexToDec(lsnInHex);
 
     public static String initialPosition = "{\n"
@@ -37,7 +28,7 @@ public class Main {
             + "    \"pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com_jctest_di_slot\": {\n"
             + "      \"sourceOffset\": {\n"
             + "        \"ts_usec\": 0,\n"
-            + "        \"lsn\": " + "1161318921160" + "\n"
+            + "        \"lsn\": " + lsnInDec + "\n"
             + "      },\n"
             + "      \"sourcePartition\": {\n"
             + "        \"server\": \"pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com_jctest_di_slot\"\n"
@@ -79,7 +70,7 @@ public class Main {
         DebeziumEngine<ChangeEvent<String, String>> engine = DebeziumEngine.create(Json.class)
                 .using(props)
                 .using(new MyOffsetCommitPolicy())
-                .notifying(new MyConsumer())
+                .notifying(new RecordConsumer())
                 .build();
         ExecutorService debeziumExecutor = new ThreadPoolExecutor(
                 1,
@@ -90,13 +81,5 @@ public class Main {
         debeziumExecutor.execute(engine);
     }
 
-
-    public static class MyConsumer implements Consumer<ChangeEvent<String, String>> {
-        @Override
-        public void accept(ChangeEvent<String, String> stringStringChangeEvent) {
-            String value = stringStringChangeEvent.value();
-            logger.info("读取到变更: \n" + Utils.JSONFormat(value));
-        }
-    }
 
 }
