@@ -30,7 +30,7 @@ public class Main {
     public static int confirm_interval_second = 600;
 
     public static String lsnInHex = "10E/5F004F90";
-    public static String lsnInDec = LSNTest.lsnHexToDec(lsnInHex);
+    public static String lsnInDec = Utils.lsnHexToDec(lsnInHex);
 
     public static String initialPosition = "{\n"
             + "  \"enginePostions\": {\n"
@@ -109,12 +109,8 @@ public class Main {
         @Override
         public void accept(ChangeEvent<String, String> stringStringChangeEvent) {
             String value = stringStringChangeEvent.value();
-            logger.info("读取到变更: \n" + JSONFormat(value));
+            logger.info("读取到变更: \n" + Utils.JSONFormat(value));
         }
     }
 
-    public static String JSONFormat(String s) {
-        JSONObject object = JSONObject.parseObject(s);
-        return JSON.toJSONString(object, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat);
-    }
 }
