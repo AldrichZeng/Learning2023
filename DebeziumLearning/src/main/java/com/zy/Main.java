@@ -64,6 +64,7 @@ public class Main {
         props.setProperty("database.dbname", "jctest");
         props.setProperty("database.history", "io.debezium.relational.history.MemoryDatabaseHistory");
         props.setProperty("decimal.handling.mode", "string");
+        // 在此无效
         props.setProperty("offset.flush.size.ms", "86400000");
         props.setProperty("plugin.name", "pgoutput");
         // engineName
@@ -90,6 +91,7 @@ public class Main {
     }
 
     public static class MyOffsetCommitPolicy implements OffsetCommitPolicy {
+        @Override
         public boolean performCommit(long numberOfMessagesSinceLastCommit, Duration timeSinceLastCommit) {
             logger.info("numberOfMessagesSinceLastCommit: " + numberOfMessagesSinceLastCommit + "\ttimeSinceLastCommit: " + timeSinceLastCommit.getSeconds());
             // 定义超过多长时间则confirm LSN
@@ -104,7 +106,6 @@ public class Main {
     }
 
     public static class MyConsumer implements Consumer<ChangeEvent<String, String>> {
-
         @Override
         public void accept(ChangeEvent<String, String> stringStringChangeEvent) {
             String value = stringStringChangeEvent.value();
