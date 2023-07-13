@@ -15,18 +15,23 @@ import org.springframework.core.io.ClassPathResource;
  */
 public class LSNTest {
     public static void main(String[] args) throws IOException {
-        Lsn lsn = Lsn.valueOf("10E/3C00AE20");
+
+        Lsn lsn = Lsn.valueOf(1161302121872L);
+        System.out.println(lsn.asString());
+        System.out.println(lsn.asLong());
+
+        lsn = Lsn.valueOf("10E/3C00AE20");
         System.out.println(lsn.asLong());
         System.out.println(lsn.asString());
-        
     }
+
     public static void test2() throws IOException {
         ClassPathResource classPathResource = new ClassPathResource("startPosition.json");
         InputStream inputStream = classPathResource.getInputStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
         StringBuilder sb = new StringBuilder();
         String line = null;
-        while((line = br.readLine())!=null){
+        while ((line = br.readLine()) != null) {
             sb.append(line);
         }
         String initialPosition = sb.toString();
@@ -34,9 +39,9 @@ public class LSNTest {
 
         System.out.println(initialPosition);
     }
-    
-    public static void test(){
-        Lsn lsn = Lsn.valueOf(1159741874432L);
+
+    public static void test() {
+        Lsn lsn = Lsn.valueOf(1161268569152L);
         System.out.println(lsn.asString());
         System.out.println(lsn.asLong());
 
@@ -52,5 +57,10 @@ public class LSNTest {
         int b = buf.getInt();
         System.out.println(b);
         System.out.println(String.format("%X", b));
+    }
+
+    public static String lsnHexToDec(String lsnInHex) {
+        Lsn lsn = Lsn.valueOf(lsnInHex);
+        return String.valueOf(lsn.asLong());
     }
 }
