@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
  * @author 匠承
  * @Date: 2023/7/13 10:18
  */
-public class Main2 {
-    private static final Logger logger = LoggerFactory.getLogger(Main2.class);
+public class MainBatch {
+    private static final Logger logger = LoggerFactory.getLogger(MainBatch.class);
 
     public static String lsnInHex = "10E/BE0BD400";
     public static String lsnInDec = Utils.lsnHexToDec(lsnInHex);
@@ -27,8 +27,9 @@ public class Main2 {
             + "  \"enginePostions\": {\n"
             + "    \"pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com_jctest_di_slot\": {\n"
             + "      \"sourceOffset\": {\n"
-            + "        \"ts_usec\": 0,\n"
-            + "        \"lsn\": " + lsnInDec + "\n"
+            + "        \"ts_usec\": 1689573489732000,\n"
+            + "        \"lsn\": " + "1183688263824" + ",\n"
+            + "        \"txId\": " + "4579394"
             + "      },\n"
             + "      \"sourcePartition\": {\n"
             + "        \"server\": \"pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com_jctest_di_slot\"\n"
@@ -39,7 +40,7 @@ public class Main2 {
 
     public static void main(String[] args) throws IOException {
         Properties props = new Properties();
-        props.setProperty("snapshot.mode", "never");
+        props.setProperty("snapshot.mode", "initial_only");
         props.setProperty("database.user", "jctest");
         props.setProperty("database.password", "DWzengyao1234");
         props.setProperty("offset.flush.interval.ms", "300000");

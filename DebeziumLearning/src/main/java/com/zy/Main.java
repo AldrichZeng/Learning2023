@@ -27,8 +27,6 @@ import org.slf4j.LoggerFactory;
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-    public static int confirm_interval_second = 600;
-
     public static String lsnInHex = "10E/5F004F90";
     public static String lsnInDec = Utils.lsnHexToDec(lsnInHex);
 
@@ -36,8 +34,9 @@ public class Main {
             + "  \"enginePostions\": {\n"
             + "    \"pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com_jctest_di_slot\": {\n"
             + "      \"sourceOffset\": {\n"
-            + "        \"ts_usec\": 0,\n"
-            + "        \"lsn\": " + "1161318921160" + "\n"
+            + "        \"ts_usec\": 1689573489732000,\n"
+            + "        \"lsn\": " + "1183688263824" + ",\n"
+            + "        \"txId\": " + "4579394"
             + "      },\n"
             + "      \"sourcePartition\": {\n"
             + "        \"server\": \"pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com_jctest_di_slot\"\n"
@@ -92,6 +91,10 @@ public class Main {
 
 
     public static class MyConsumer implements Consumer<ChangeEvent<String, String>> {
+        /**
+         * 官网并没有提及这种方式的使用
+         * @param stringStringChangeEvent the input argument
+         */
         @Override
         public void accept(ChangeEvent<String, String> stringStringChangeEvent) {
             String value = stringStringChangeEvent.value();

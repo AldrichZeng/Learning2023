@@ -58,9 +58,22 @@ public class LSNTestTest {
         System.out.println(lsn.asString());
         System.out.println(lsn.asLong());
 
-        lsn = Lsn.valueOf("10E/3C00AE20");
+        lsn = Lsn.valueOf("112/AB001938");
         System.out.println(lsn.asLong());
         System.out.println(lsn.asString());
+    }
+
+    // 1160513594416
+    @Test
+    public void test4(){
+        Lsn lsn = Lsn.valueOf("112/A8002E48");
+        System.out.println(lsn.asLong());//1161318921736
+    }
+
+    @Test
+    public void test5(){
+        Lsn lsn = Lsn.valueOf("10F/20002078");
+        System.out.println(lsn.asLong());//1162829616128
     }
 
 }
