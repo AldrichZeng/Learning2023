@@ -75,6 +75,8 @@ public class Main {
         // 从哪个位点开始读
         props.setProperty("offset.initial.position.json", initialPosition);
         props.setProperty("connector.class", "io.debezium.connector.postgresql.PostgresConnector");
+        // 心跳机制
+        props.setProperty("heartbeat.interval.ms", "1000");
         DebeziumEngine<ChangeEvent<String, String>> engine = DebeziumEngine.create(Json.class)
                 .using(props)
                 .using(new MyOffsetCommitPolicy())

@@ -13,14 +13,14 @@ import org.slf4j.LoggerFactory;
 public class MyOffsetCommitPolicy implements OffsetCommitPolicy {
     private static final Logger logger = LoggerFactory.getLogger(MyOffsetCommitPolicy.class);
 
-    public static int confirm_interval_second = 10000;
+    public static int confirm_interval_second = 5;
 
     @Override
     public boolean performCommit(long numberOfMessagesSinceLastCommit, Duration timeSinceLastCommit) {
         logger.info("numberOfMessagesSinceLastCommit: " + numberOfMessagesSinceLastCommit + "\ttimeSinceLastCommit: " + timeSinceLastCommit.getSeconds());
         // 定义超过多长时间则confirm LSN
         if (timeSinceLastCommit.getSeconds() > confirm_interval_second) {
-            logger.info("commit LSN");
+            logger.info("Do commit LSN");
             return true;
         } else {
             logger.info("Do not commit LSN");
