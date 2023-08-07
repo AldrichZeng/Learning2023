@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicReference;
 
 import io.debezium.connector.postgresql.connection.Lsn;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
@@ -66,7 +68,7 @@ public class LSNTestTest {
     // 1160513594416
     @Test
     public void test4(){
-        Lsn lsn = Lsn.valueOf("112/A8002E48");
+        Lsn lsn = Lsn.valueOf("112/AB001938");
         System.out.println(lsn.asLong());//1161318921736
     }
 
@@ -74,6 +76,22 @@ public class LSNTestTest {
     public void test5(){
         Lsn lsn = Lsn.valueOf("10F/20002078");
         System.out.println(lsn.asLong());//1162829616128
+    }
+
+    @Test
+    public void test6(){
+        AtomicReference<Boolean> successDeleteSlot = new AtomicReference<>(true);
+        successDeleteSlot.set(false);
+        System.out.println(successDeleteSlot.get());
+        if(!successDeleteSlot.get()){
+            System.out.println("hallo");
+        }
+
+        AtomicReference<String> str = new AtomicReference<>();
+        System.out.println(str);
+        Assert.assertNull(str.get());
+        str.set("abc");
+        System.out.println(str.get());
     }
 
 }
