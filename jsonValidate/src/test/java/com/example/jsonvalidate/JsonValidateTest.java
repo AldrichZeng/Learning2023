@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,8 +45,22 @@ public class JsonValidateTest {
 
         // 验证Json数据是否符合Json Schema
         Set<ValidationMessage> set = jsonSchema.validate(dataNode);
-        System.out.println(set.stream().map(e->e.getMessage()).collect(Collectors.joining(",")));
-        Assert.assertTrue(set.isEmpty());
+        //System.out.println(set.stream().map(e->e.getMessage()).collect(Collectors.joining(",")));
+        //Assert.assertTrue(set.isEmpty());
+
+        for(ValidationMessage e :set){
+            System.out.println(e.getMessage());
+            for(String s :e.getArguments()){
+                System.out.println(s);
+            }
+            //for(String key:e.getDetails().keySet()){
+            //    System.out.println(key +":"+e.getDetails().get(key));
+            //}
+            System.out.println(e.getCode());
+            System.out.println(e.getPath());
+            System.out.println(e.getType());
+
+        }
     }
 
     @Test

@@ -1,11 +1,14 @@
 package com.example.pgjdbc;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.DefaultJSONParser;
 
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -50,5 +53,26 @@ public class NormalTest {
     public void test3() {
         String jsonStr = "20";
         JSONObject jsonObject = JSON.parseObject(jsonStr);
+    }
+
+    @Test
+    public void test4(){
+        String a = "ROLE_1234";
+        System.out.println(a.substring(5));
+    }
+
+    @Test
+    public void test5(){
+        Long timestamp = 1691825938458L;
+        //Date date = new Date(timestamp);
+        //SimpleDateFormat  dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        //System.out.println(dateFormat.format(date));
+        System.out.println(FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss").format(timestamp));
+    }
+
+    @Test
+    public void test6(){
+        Long a = 123L;
+        System.out.println(String.format("abc %s", a));
     }
 }

@@ -1,7 +1,6 @@
 package com.zy;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -9,14 +8,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
-
+import io.debezium.data.Envelope;
+import io.debezium.embedded.EmbeddedEngineChangeEvent;
 import io.debezium.engine.ChangeEvent;
 import io.debezium.engine.DebeziumEngine;
 import io.debezium.engine.format.Json;
-import io.debezium.engine.spi.OffsetCommitPolicy;
+import org.apache.kafka.connect.source.SourceRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +73,19 @@ public class Main {
         props.setProperty("offset.initial.position.json", initialPosition);
         props.setProperty("connector.class", "io.debezium.connector.postgresql.PostgresConnector");
         // 心跳机制
-        props.setProperty("heartbeat.interval.ms", "1000");
+        //props.setProperty("heartbeat.interval.ms", "1000");
+        //props.setProperty("transforms", "unwrap,converters");
+        //props.setProperty("transforms.unwrap.type", "io.debezium.transforms.UnwrapFromEnvelope");
+        //props.setProperty("transforms.converters.type", "org.apache.kafka.connect.transforms.Converters");
+        //props.setProperty("transforms.converters.target.type", "string");
+        //props.setProperty("transforms.converters.schemas.enable", "false");
+        //props.setProperty("skipped.operations","c");
+        //DebeziumEngine<ChangeEvent<SourceRecord, SourceRecord>> engine = DebeziumEngine.create(Connect.class)
+        //        .using(props)
+        //        .using(new MyOffsetCommitPolicy())
+        //        .notifying(new MyConsumer2())
+        //        .build();
+        props.setProperty("truncate.handling.mode", "include");
         DebeziumEngine<ChangeEvent<String, String>> engine = DebeziumEngine.create(Json.class)
                 .using(props)
                 .using(new MyOffsetCommitPolicy())
@@ -91,10 +100,10 @@ public class Main {
         debeziumExecutor.execute(engine);
     }
 
-
     public static class MyConsumer implements Consumer<ChangeEvent<String, String>> {
         /**
          * 官网并没有提及这种方式的使用
+         *
          * @param stringStringChangeEvent the input argument
          */
         @Override
@@ -104,4 +113,14 @@ public class Main {
         }
     }
 
+    public static class MyConsumer2 implements Consumer<ChangeEvent<SourceRecord, SourceRecord>> {
+
+        public void accept(ChangeEvent<SourceRecord, SourceRecord> event) {
+            SourceRecord rawRecord = ((EmbeddedEngineChangeEvent) event).sourceRecord();
+            logger.info("rawRecord: {}", rawRecord);
+            logger.info("rawRecord.value(): {}", rawRecord.value());
+            Envelope.Operation op = Envelope.operationFor(rawRecord);
+            logger.info("op: {}", op);
+        }
+    }
 }

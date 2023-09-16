@@ -1,8 +1,8 @@
 {
-  "envType": "PRD",
-  "taskAuthType": "PROJECT",
+  "envType": "PRDsdf",
+  "taskAuthType": "PROJECTsdf",
   "taskSubmitter": "",
-  "project": "jc_odps_dev",
+  "project": "123jc_odps_dev",
   "region": "cn-shanghai",
   "projectCreateOption": {
     "mode": "SHARE",
