@@ -3,7 +3,6 @@ package com.zy;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
-import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -89,7 +88,8 @@ public class MainSourceRecord {
         props.setProperty("truncate.handling.mode", "include");
         //props.setProperty("schema.refresh.mode", "columns_diff_exclude_unchanged_toast");
 
-        props.setProperty("table.include.list", Utils.generateTables(1,100, "bigschema"));
+        //props.setProperty("table.include.list", Utils.generateTables(1,100, "bigschema"));
+        props.setProperty("table.include.list", Constants.tables10withTest());
         DebeziumEngine<ChangeEvent<SourceRecord, SourceRecord>> engine1 = DebeziumEngine.create(Connect.class)
                 .using(props)
                 .using(new MyOffsetCommitPolicy())

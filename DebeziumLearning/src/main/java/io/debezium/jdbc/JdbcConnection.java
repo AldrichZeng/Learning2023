@@ -28,10 +28,13 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
@@ -1186,12 +1189,50 @@ public class JdbcConnection implements AutoCloseable {
         if (totalTables == tableIds.size() || config.getBoolean(RelationalDatabaseConnectorConfig.SNAPSHOT_FULL_COLUMN_SCAN_FORCE)) {
             columnsByTable = getColumnsDetails(databaseCatalog, schemaNamePattern, null, tableFilter, columnFilter, metadata, viewIds);
         } else {
+
+            ///**
+            // * 单并发
+            // */
+            //for (TableId includeTable : tableIds) {
+            //    LOGGER.debug("Retrieving columns of table {}", includeTable);
+            //
+            //    Map<TableId, List<Column>> cols = getColumnsDetails(databaseCatalog, schemaNamePattern, includeTable.table(), tableFilter,
+            //            columnFilter, metadata, viewIds);
+            //    columnsByTable.putAll(cols);
+            //}
+
+            /**
+             * 多并发
+             */
+            LOGGER.info("The number of tables is: {}", tableIds.size());
+            int threadPoolSize = tableIds.size() / 100 > 10 ? 10 : tableIds.size() / 100;
+            ExecutorService executor = new ThreadPoolExecutor(
+                    threadPoolSize,
+                    threadPoolSize + 5,
+                    0L,
+                    TimeUnit.MILLISECONDS,
+                    new LinkedBlockingQueue<Runnable>(tableIds.size()));
+
+            List<Future<Map<TableId, List<Column>>>> futures = new ArrayList<>();
             for (TableId includeTable : tableIds) {
                 LOGGER.debug("Retrieving columns of table {}", includeTable);
-
-                Map<TableId, List<Column>> cols = getColumnsDetails(databaseCatalog, schemaNamePattern, includeTable.table(), tableFilter,
+                GetColumnDetailsCallable callable = new GetColumnDetailsCallable(includeTable.catalog(), includeTable.schema(), includeTable.table(), tableFilter,
                         columnFilter, metadata, viewIds);
-                columnsByTable.putAll(cols);
+                Future<Map<TableId, List<Column>>> future = executor.submit(callable);
+                futures.add(future);
+            }
+            try {
+                LOGGER.info("executor started");
+                for (Future<Map<TableId, List<Column>>> intFuture : futures) {
+                    Map<TableId, List<Column>> tableIdListMap = intFuture.get();
+                    columnsByTable.putAll(tableIdListMap);
+                    LOGGER.info("tableIdListMap size: {}", tableIdListMap.size());
+                    LOGGER.info("have put size: {}", columnsByTable.size());
+                }
+            } catch (Exception e) {
+                LOGGER.error("executor error");
+            } finally {
+                executor.shutdown();
             }
         }
 
@@ -1214,6 +1255,34 @@ public class JdbcConnection implements AutoCloseable {
         }
     }
 
+    public class GetColumnDetailsCallable implements Callable<Map<TableId, List<Column>>> {
+
+        String databaseCatalog;
+        String schemaNamePattern;
+        String tableName;
+        TableFilter tableFilter;
+        ColumnNameFilter columnFilter;
+        DatabaseMetaData metadata;
+        Set<TableId> viewIds;
+
+        public GetColumnDetailsCallable(String databaseCatalog, String schemaNamePattern,
+                String tableName, TableFilter tableFilter, ColumnNameFilter columnFilter, DatabaseMetaData metadata,
+                final Set<TableId> viewIds) {
+            this.databaseCatalog = databaseCatalog;
+            this.schemaNamePattern = schemaNamePattern;
+            this.tableName = tableName;
+            this.tableFilter = tableFilter;
+            this.columnFilter = columnFilter;
+            this.metadata = metadata;
+            this.viewIds = viewIds;
+        }
+
+        public Map<TableId, List<Column>> call() throws Exception {
+            return getColumnsDetails(this.databaseCatalog, this.schemaNamePattern, this.tableName, this.tableFilter,
+                    this.columnFilter, this.metadata, this.viewIds);
+        }
+    }
+
     protected String resolveCatalogName(String catalogName) {
         // default behavior is to simply return the value from the JDBC result set
         return catalogName;
@@ -1228,7 +1297,6 @@ public class JdbcConnection implements AutoCloseable {
 
         try {
             ResultSet columnMetadata = metadata.getColumns(databaseCatalog, schemaNamePattern, tableName, null);
-            LOGGER.info("columnMetadata:{}", columnMetadata);
             while (columnMetadata.next()) {
                 String catalogName = resolveCatalogName(columnMetadata.getString(1));
                 String schemaName = columnMetadata.getString(2);
@@ -1247,13 +1315,8 @@ public class JdbcConnection implements AutoCloseable {
                             .add(column.create());
                 });
             }
-            try {
-                Thread.sleep(500);
-            } catch (Exception e) {
-
-            }
         } catch (Exception e) {
-
+            LOGGER.error("error when handle table: {}.{}", schemaNamePattern, tableName);
         }
         return columnsByTable;
     }
