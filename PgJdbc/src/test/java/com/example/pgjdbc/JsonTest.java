@@ -1,8 +1,5 @@
 package com.example.pgjdbc;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.DefaultJSONParser;
@@ -73,11 +70,16 @@ public class JsonTest {
         System.out.println(StringUtils.isAlpha("ab3"));
     }
 
-
     @Test
-    public void test7(){
-
+    public void test7() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            sb.append("xyz");
+        }
+        String str = "1,name1,name1,name1,name1,name1,name1,name1,name1,name1";
+        str = str.replace("name", sb.toString());
+        for (int i = 1; i <= 9; i++) {
+            System.out.println(str.replace("1", String.valueOf(i)));
+        }
     }
-
-
 }

@@ -31,7 +31,6 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -68,6 +67,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A utility that simplifies using a JDBC connection and executing transactions composed of multiple statements.
+ * 改编自Debezium 1.8.1.Final源码，优化readSchema，在初始化阶段减少拉取表结构的耗时
  *
  * @author Randall Hauch
  */
@@ -79,6 +79,11 @@ public class JdbcConnection implements AutoCloseable {
     private static final int STATEMENT_CACHE_CAPACITY = 10_000;
     private final static Logger LOGGER = LoggerFactory.getLogger(JdbcConnection.class);
     private static final int CONNECTION_VALID_CHECK_TIMEOUT_IN_SEC = 3;
+
+    /**
+     * 用于控制进度打印的间隔时间
+     */
+    private long lastPrintTimeMiilis = -1;
     private final Map<String, PreparedStatement> statementCache = new BoundedConcurrentHashMap<>(STATEMENT_CACHE_CAPACITY, 16, Eviction.LIRS,
             new EvictionListener<String, PreparedStatement>() {
 
@@ -108,7 +113,7 @@ public class JdbcConnection implements AutoCloseable {
         Connection connect(JdbcConfiguration config) throws SQLException;
     }
 
-    private class ConnectionFactoryDecorator implements ConnectionFactory {
+    public class ConnectionFactoryDecorator implements ConnectionFactory {
         private final ConnectionFactory defaultConnectionFactory;
         private final Supplier<ClassLoader> classLoaderSupplier;
         private ConnectionFactory customConnectionFactory;
@@ -955,7 +960,7 @@ public class JdbcConnection implements AutoCloseable {
     }
 
     private void doClose() throws SQLException {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
+        ExecutorService executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
         // attempting to close the connection gracefully
         Future<Object> futureClose = executor.submit(() -> {
             conn.close();
@@ -1137,6 +1142,8 @@ public class JdbcConnection implements AutoCloseable {
      * Create definitions for each tables in the database, given the catalog name, schema pattern, table filter, and
      * column filter.
      *
+     * 这里修改了Debezium源码
+     *
      * @param tables                     the set of table definitions to be modified; may not be null
      * @param databaseCatalog            the name of the catalog, which is typically the database name; may be null if all accessible
      *                                   databases are to be processed
@@ -1187,53 +1194,25 @@ public class JdbcConnection implements AutoCloseable {
         Map<TableId, List<Column>> columnsByTable = new HashMap<>();
 
         if (totalTables == tableIds.size() || config.getBoolean(RelationalDatabaseConnectorConfig.SNAPSHOT_FULL_COLUMN_SCAN_FORCE)) {
+            // Debezium原始逻辑，当要同步的表数量和当前库下的表数量相等时，会批量获取该库下的所有表，这里未对源码做改动
             columnsByTable = getColumnsDetails(databaseCatalog, schemaNamePattern, null, tableFilter, columnFilter, metadata, viewIds);
         } else {
-
-            ///**
-            // * 单并发
-            // */
-            //for (TableId includeTable : tableIds) {
-            //    LOGGER.debug("Retrieving columns of table {}", includeTable);
-            //
-            //    Map<TableId, List<Column>> cols = getColumnsDetails(databaseCatalog, schemaNamePattern, includeTable.table(), tableFilter,
-            //            columnFilter, metadata, viewIds);
-            //    columnsByTable.putAll(cols);
-            //}
-
-            /**
-             * 多并发
-             */
+            long startTimeMillis = System.currentTimeMillis();
+            this.lastPrintTimeMiilis = startTimeMillis;
             LOGGER.info("The number of tables is: {}", tableIds.size());
-            int threadPoolSize = tableIds.size() / 100 > 10 ? 10 : tableIds.size() / 100;
-            ExecutorService executor = new ThreadPoolExecutor(
-                    threadPoolSize,
-                    threadPoolSize + 5,
-                    0L,
-                    TimeUnit.MILLISECONDS,
-                    new LinkedBlockingQueue<Runnable>(tableIds.size()));
-
-            List<Future<Map<TableId, List<Column>>>> futures = new ArrayList<>();
             for (TableId includeTable : tableIds) {
-                LOGGER.debug("Retrieving columns of table {}", includeTable);
-                GetColumnDetailsCallable callable = new GetColumnDetailsCallable(includeTable.catalog(), includeTable.schema(), includeTable.table(), tableFilter,
-                        columnFilter, metadata, viewIds);
-                Future<Map<TableId, List<Column>>> future = executor.submit(callable);
-                futures.add(future);
-            }
-            try {
-                LOGGER.info("executor started");
-                for (Future<Map<TableId, List<Column>>> intFuture : futures) {
-                    Map<TableId, List<Column>> tableIdListMap = intFuture.get();
-                    columnsByTable.putAll(tableIdListMap);
-                    LOGGER.info("tableIdListMap size: {}", tableIdListMap.size());
-                    LOGGER.info("have put size: {}", columnsByTable.size());
+                if (columnsByTable.containsKey(includeTable)) {
+                    continue;
                 }
-            } catch (Exception e) {
-                LOGGER.error("executor error");
-            } finally {
-                executor.shutdown();
+                LOGGER.debug("Retrieving columns of table {}", includeTable);
+                // schemaNamePattern为null时，会获取多个schema下的同名表，即批量获取表结构。
+                Map<TableId, List<Column>> tableIdListMap = getColumnsDetails(databaseCatalog, schemaNamePattern, includeTable.table(), tableFilter, columnFilter, metadata, viewIds);
+                columnsByTable.putAll(tableIdListMap);
+                printProcess(tableIds.size(), columnsByTable.size());
             }
+            long endTimeMillis = System.currentTimeMillis();
+            // 获取表结构的过程已完成，打印总耗时
+            LOGGER.info("Complete reading metadata of {} tables. Time cost: {} seconds", tableIds.size(), (endTimeMillis - startTimeMillis) / 1000.0);
         }
 
         // Read the metadata for the primary keys ...
@@ -1252,6 +1231,25 @@ public class JdbcConnection implements AutoCloseable {
             // Remove any definitions for tables that were not found in the database metadata ...
             tableIdsBefore.removeAll(columnsByTable.keySet());
             tableIdsBefore.forEach(tables::removeTable);
+        }
+    }
+
+    /**
+     * 进度打印，避免StreamX给用户hang住感觉
+     *
+     * @param total
+     * @param current
+     * @param currentTimeMillis
+     */
+    public void printProcess(int total, int current) {
+        if (this.lastPrintTimeMiilis == -1) {
+            return;
+        }
+        long currentTimeMillis = System.currentTimeMillis();
+        // 每隔10秒打印一次进度
+        if (currentTimeMillis - lastPrintTimeMiilis > 10 * 1000) {
+            LOGGER.info("Read metadata for tables. {} tables have been processed, total: {} tables.", current, total);
+            lastPrintTimeMiilis = currentTimeMillis;
         }
     }
 
@@ -1292,7 +1290,6 @@ public class JdbcConnection implements AutoCloseable {
             String tableName, TableFilter tableFilter, ColumnNameFilter columnFilter, DatabaseMetaData metadata,
             final Set<TableId> viewIds)
             throws SQLException {
-        LOGGER.info("zengyao log getColumnsDetail for {}", tableName);
         Map<TableId, List<Column>> columnsByTable = new HashMap<>();
 
         try {

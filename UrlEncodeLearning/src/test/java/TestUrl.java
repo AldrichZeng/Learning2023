@@ -8,8 +8,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+
+import com.mysql.jdbc.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.web.util.UriUtils;
@@ -97,5 +103,130 @@ public class TestUrl {
         System.out.println("decodedPath = " + decodedPath);
         Assert.assertEquals("/Path%201/Path+2", encodedPath);
         Assert.assertEquals("/Path 1/Path+2", decodedPath);
+    }
+
+    @Test
+    public void test1() {
+        // 模拟313的原始串
+        String a = "aaa\\nbbb";
+        // 一次转义后
+        System.out.println(a);
+        // 不转义
+        String b = StringEscapeUtils.escapeJava(a);
+        System.out.println(b);
+
+        //String c = StringUtils.escapeQuote(b, "\\");
+        //System.out.println(c);
+    }
+
+    @Test
+    public void test2() {
+        // 模拟313的原始串
+        String a = "aaa\\u0001nbbb";
+        // 一次转义后
+        System.out.println(a);
+        // 不转义
+        String b = StringEscapeUtils.escapeJava(a);
+        System.out.println(b);
+
+        Pattern pattern = Pattern.compile(b, Pattern.LITERAL);
+        System.out.println(pattern.pattern());
+
+        String c = b.replace("\\\\", "\\");
+        System.out.println(c);
+    }
+
+    @Test
+    public void test3() {
+        String str = "{"
+                + "\"parameter\":{"
+                + "\"lineDelimiter\": \"a\\\\nb\""
+                + "}"
+                + "}";
+        JSONObject object = JSON.parseObject(str);
+        System.out.println("str=" + str);
+        String objectStr = object.toString();
+        System.out.println("object=" + object.toString());
+        JSONObject parameter = object.getJSONObject("parameter");
+        String espaceDelimiter = parameter.getString("lineDelimiter");
+        System.out.println("get result: " + espaceDelimiter);
+
+        String originDelimiter = StringEscapeUtils.escapeJava(espaceDelimiter);
+        System.out.println("escape: " + originDelimiter);
+
+        String newDelimiter = originDelimiter.replace("\\\\", "\\");
+
+        if (parameter.containsKey("lineDelimiter")) {
+            String originValue = "\"lineDelimiter\":\"" + originDelimiter + "\"";
+            String newValue = "\"lineDelimiter\":\"" + newDelimiter + "\"";
+            String newParam = parameter.toString().replace(originValue, newValue);
+            object.put("parameter", JSON.parseObject(newParam));
+        } else {
+            System.out.println("没有lineDelimiter");
+        }
+
+        System.out.println(object.toString());
+        System.out.println("after:" + object.getJSONObject("parameter").getString("lineDelimiter"));
+        System.out.println("after:" + StringEscapeUtils.escapeJava(object.getJSONObject("parameter").getString("lineDelimiter")));
+    }
+
+    @Test
+    public void testreplace() {
+        String a = "\\n";
+        //System.out.println(a.replace("a", "b"));
+
+    }
+
+    @Test
+    public void test5() {
+        String a = "a\\nb";
+        System.out.println(a);
+        System.out.println(a.length());
+        String b = StringEscapeUtils.escapeJava(a);
+        System.out.println(b);
+        System.out.println(b.length());
+        System.out.println(a.contains("\\\\"));
+        System.out.println(b.contains("\\\\"));
+    }
+
+    @Test
+    public void test6(){
+        String a = "\\n";
+        System.out.println(a); // \n
+        String b = StringEscapeUtils.escapeJava(a);
+        System.out.println(b); // \\n
+
+        //System.out.println(StringUtils.escapeQuote(a,"\\"));// \\n
+
+        System.out.println(StringEscapeUtils.unescapeJava(b));
+
+    }
+
+    @Test
+    public void test7(){
+        String str = "{"
+                + "\"parameter\":{"
+                + "\"lineDelimiter\": \"a\\\\nb\""
+                + "}"
+                + "}";
+        JSONObject object = JSON.parseObject(str);
+        System.out.println("str=" + str);
+        System.out.println(str.length());
+        String objectStr = object.toString();
+        System.out.println("object=" + object.toString());// \\n
+        System.out.println(object.toString().length());
+        JSONObject parameter = object.getJSONObject("parameter");
+        String espaceDelimiter = parameter.getString("lineDelimiter");// \n
+        System.out.println("get result: " + espaceDelimiter); // \n
+
+        String newLineDelimiter = StringEscapeUtils.unescapeJava(espaceDelimiter);
+        //String originDelimiter = StringEscapeUtils.escapeJava();
+
+        parameter.put("lineDelimiter", newLineDelimiter);
+        //parameter.put("lineDelimiter2",newLineDelimiter);
+        System.out.println(object.toString());
+        System.out.println(object.toString().length());
+
+
     }
 }

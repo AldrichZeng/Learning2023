@@ -89,7 +89,7 @@ public class MainSourceRecord {
         //props.setProperty("schema.refresh.mode", "columns_diff_exclude_unchanged_toast");
 
         //props.setProperty("table.include.list", Utils.generateTables(1,100, "bigschema"));
-        props.setProperty("table.include.list", Constants.tables10withTest());
+        props.setProperty("table.include.list", Constants.tables167withTest());
         DebeziumEngine<ChangeEvent<SourceRecord, SourceRecord>> engine1 = DebeziumEngine.create(Connect.class)
                 .using(props)
                 .using(new MyOffsetCommitPolicy())
