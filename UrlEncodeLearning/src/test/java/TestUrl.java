@@ -15,6 +15,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 import com.mysql.jdbc.StringUtils;
+import javafx.beans.binding.StringExpression;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -229,4 +230,14 @@ public class TestUrl {
 
 
     }
+    @Test
+    public void test8(){
+        String a= String.format("abc:%s", "aa\\n\\\\b");
+        System.out.println(a);
+        System.out.println(StringEscapeUtils.escapeJava(a));
+        Map<String, String> map = new HashMap<>();
+        map.put(a,a);
+        System.out.println(map);
+    }
 }
+
