@@ -90,6 +90,7 @@ public class MainSourceRecord {
 
         //props.setProperty("table.include.list", Utils.generateTables(1,100, "bigschema"));
         props.setProperty("table.include.list", Constants.tables167withTest());
+        props.setProperty("table.include.list", Constants.tables167withTest());
         DebeziumEngine<ChangeEvent<SourceRecord, SourceRecord>> engine1 = DebeziumEngine.create(Connect.class)
                 .using(props)
                 .using(new MyOffsetCommitPolicy())

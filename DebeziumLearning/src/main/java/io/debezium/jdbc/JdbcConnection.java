@@ -1239,7 +1239,6 @@ public class JdbcConnection implements AutoCloseable {
      *
      * @param total
      * @param current
-     * @param currentTimeMillis
      */
     public void printProcess(int total, int current) {
         if (this.lastPrintTimeMiilis == -1) {
