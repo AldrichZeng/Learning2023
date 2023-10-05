@@ -640,6 +640,7 @@ public class JdbcConnection implements AutoCloseable {
      * @see #execute(Operations)
      */
     public <T> T queryAndMap(String query, StatementFactory statementFactory, ResultSetMapper<T> mapper) throws SQLException {
+        LOGGER.info("zengyao log, queryAndMap sql: {}", query);
         Objects.requireNonNull(mapper, "Mapper must be provided");
         Connection conn = connection();
         try (Statement statement = statementFactory.createStatement(conn);) {

@@ -19,6 +19,12 @@ import org.springframework.core.io.ClassPathResource;
 public class LSNTestTest {
 
     @Test
+    public void test(){
+        Lsn lsn = Lsn.valueOf(1557898827456L);
+        System.out.println(lsn.asString());
+    }
+
+    @Test
     public void test1(){
         Lsn lsn = Lsn.valueOf(1161268569152L);
         System.out.println(lsn.asString());

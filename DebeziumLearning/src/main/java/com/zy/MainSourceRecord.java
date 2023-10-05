@@ -3,6 +3,7 @@ package com.zy;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -37,7 +38,8 @@ public class MainSourceRecord {
             + "      \"sourceOffset\": {\n"
             + "        \"ts_usec\": 1689573489732000,\n"
             + "        \"lsn\": " + "1183688263824" + ",\n"
-            + "        \"txId\": " + "4579394"
+            + "        \"txId\": " + "4579394" + ",\n"
+            + "        \"lsn_proc\": " + "1557898827455"
             + "      },\n"
             + "      \"sourcePartition\": {\n"
             + "        \"server\": \"pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com_jctest_di_slot\"\n"
@@ -89,8 +91,8 @@ public class MainSourceRecord {
         //props.setProperty("schema.refresh.mode", "columns_diff_exclude_unchanged_toast");
 
         //props.setProperty("table.include.list", Utils.generateTables(1,100, "bigschema"));
-        props.setProperty("table.include.list", Constants.tables167withTest());
-        props.setProperty("table.include.list", Constants.tables167withTest());
+        //props.setProperty("table.include.list", Constants.tables167withTest());
+        props.setProperty("table.include.list", "public.debezium_test");
         DebeziumEngine<ChangeEvent<SourceRecord, SourceRecord>> engine1 = DebeziumEngine.create(Connect.class)
                 .using(props)
                 .using(new MyOffsetCommitPolicy())
