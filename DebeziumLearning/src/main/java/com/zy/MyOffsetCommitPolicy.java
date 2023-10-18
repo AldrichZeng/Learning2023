@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 public class MyOffsetCommitPolicy implements OffsetCommitPolicy {
     private static final Logger logger = LoggerFactory.getLogger(MyOffsetCommitPolicy.class);
 
-    public static int confirm_interval_second = 3600 * 100;
+    public static int confirm_interval_second = 20;
 
     @Override
     public boolean performCommit(long numberOfMessagesSinceLastCommit, Duration timeSinceLastCommit) {

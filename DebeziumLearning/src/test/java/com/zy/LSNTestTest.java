@@ -19,10 +19,19 @@ import org.springframework.core.io.ClassPathResource;
 public class LSNTestTest {
 
     @Test
-    public void test(){
-        Lsn lsn = Lsn.valueOf(1557898827456L);
-        System.out.println(lsn.asString());
+    public void test4(){
+        Lsn lsn = Lsn.valueOf("174/96002030");
+        System.out.println(lsn.asLong());//1161318921736
     }
+
+    @Test
+    public void test(){
+        Lsn lsn = Lsn.valueOf(1600244422408L);
+        System.out.println(lsn.asString());
+
+        System.out.println(MainSourceRecord.initialPosition);
+    }
+
 
     @Test
     public void test1(){
@@ -71,12 +80,6 @@ public class LSNTestTest {
         System.out.println(lsn.asString());
     }
 
-    // 1160513594416
-    @Test
-    public void test4(){
-        Lsn lsn = Lsn.valueOf("112/AB001938");
-        System.out.println(lsn.asLong());//1161318921736
-    }
 
     @Test
     public void test5(){

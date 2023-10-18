@@ -3,14 +3,12 @@ package com.zy;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
-import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-import io.debezium.connector.postgresql.PostgresOffsetContext;
 import io.debezium.connector.postgresql.SourceInfo;
 import io.debezium.connector.postgresql.connection.Lsn;
 import io.debezium.data.Envelope;
@@ -18,7 +16,6 @@ import io.debezium.embedded.Connect;
 import io.debezium.embedded.EmbeddedEngineChangeEvent;
 import io.debezium.engine.ChangeEvent;
 import io.debezium.engine.DebeziumEngine;
-import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.slf4j.Logger;
@@ -28,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * @author 匠承
  * @Date: 2023/7/13 10:18
  */
-public class MainSourceRecord {
+public class Test2 {
     private static final Logger logger = LoggerFactory.getLogger(MainSourceRecord.class);
 
     public static String lsnInHex = "10E/BE0BD400";
@@ -38,10 +35,10 @@ public class MainSourceRecord {
             + "  \"enginePostions\": {\n"
             + "    \"pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com_jctest_di_slot\": {\n"
             + "      \"sourceOffset\": {\n"
-            + "        \"ts_usec\": 0,\n"
-            //+ "        \"lsn\": " + "1183688263824" + ",\n"
-            //+ "        \"txId\": " + "4579394" + ",\n"
-            + "        \"lsn_proc\": " + "1000261202952"
+            + "        \"ts_usec\": 1689573489732000,\n"
+            + "        \"lsn\": " + "1183688263824" + ",\n"
+            + "        \"txId\": " + "4579394" + ",\n"
+            + "        \"lsn_proc\": " + "1591822260831"
             + "      },\n"
             + "      \"sourcePartition\": {\n"
             + "        \"server\": \"pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com_jctest_di_slot\"\n"
@@ -51,13 +48,6 @@ public class MainSourceRecord {
             + "}";
 
     public static void main(String[] args) throws IOException {
-        //Scanner scanner = new Scanner(System.in);
-        //if (scanner.hasNext()) {
-        //    int a = scanner.nextInt();
-        //    if (a == 5) {
-        //        return;
-        //    }
-        //}
 
         Properties props = new Properties();
         props.setProperty("snapshot.mode", "never");
@@ -66,9 +56,9 @@ public class MainSourceRecord {
         props.setProperty("offset.flush.interval.ms", "300000");
         props.setProperty("database.port", "5432");
         // 复制槽名称
-        props.setProperty("slot.name", "di_slot_mac");
+        props.setProperty("slot.name", "di_slot_mac2");
         // publication
-        props.setProperty("publication.name", "di_pub_mac");
+        props.setProperty("publication.name", "di_pub_mac2");
         props.setProperty("tombstones.on.delete", "false");
         props.setProperty("database.hostname", "pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com");
         // 表名
@@ -86,15 +76,12 @@ public class MainSourceRecord {
         props.setProperty("database.server.name", "pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com_jctest_di_slot");
         props.setProperty("publication.autocreate.mode", "filtered");
         // 从哪个位点开始读
-        //props.setProperty("offset.initial.position.json", initialPosition);
+        props.setProperty("offset.initial.position.json", initialPosition);
         props.setProperty("connector.class", "io.debezium.connector.postgresql.PostgresConnector");
-        //props.setProperty("heartbeat.interval.ms", "5000");
+        props.setProperty("heartbeat.interval.ms", "5000");
         props.setProperty("truncate.handling.mode", "include");
-        //props.setProperty("schema.refresh.mode", "columns_diff_exclude_unchanged_toast");
 
-        //props.setProperty("table.include.list", Utils.generateTables(1,100, "bigschema"));
-        //props.setProperty("table.include.list", Constants.tables167withTest());
-        props.setProperty("table.include.list", "public.debezium_test");
+        props.setProperty("table.include.list", "public.debezium_test1");
         DebeziumEngine<ChangeEvent<SourceRecord, SourceRecord>> engine1 = DebeziumEngine.create(Connect.class)
                 .using(props)
                 .using(new MyOffsetCommitPolicy())
@@ -128,7 +115,7 @@ public class MainSourceRecord {
                 logger.info("rawRecord: {}", rawRecord);
                 logger.info("rawRecord.value(): {}", rawRecord.value());
                 logger.info("rawRecord.sourceOffset: {}", rawRecord.sourceOffset());
-                logger.info("lsn = {}, lsn_commit = {}", Lsn.valueOf((Long) (rawRecord.sourceOffset().get(SourceInfo.LSN_KEY))),Lsn.valueOf((Long) (rawRecord.sourceOffset().get(PostgresOffsetContext.LAST_COMMIT_LSN_KEY))));
+                logger.info("lsn = {}", Lsn.valueOf((Long) (rawRecord.sourceOffset().get(SourceInfo.LSN_KEY))));
                 logger.info("rawRecord.sourcePartition: {}", rawRecord.sourcePartition());
                 Envelope.Operation op = Envelope.operationFor(rawRecord);
                 logger.info("op: {}", op);
@@ -136,9 +123,6 @@ public class MainSourceRecord {
                     logger.info("it is heartbeat");
                     //Struct value = (Struct) rawRecord.value();
                     //Long eventTimestampMills = value.getInt64(SourceInfo.TIMESTAMP_KEY);
-                    //logger.info("heartbeat value = {}", value);
-                    //logger.info("heartbeat eventTimestampMills: {}", eventTimestampMills);
-                    //logger.info("heartbeat schema: {}", value.schema());
                 }
                 logger.info("========================");
                 //} else {

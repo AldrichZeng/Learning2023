@@ -14,8 +14,6 @@ import java.util.stream.Collectors;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
-import com.mysql.jdbc.StringUtils;
-import javafx.beans.binding.StringExpression;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -139,36 +137,39 @@ public class TestUrl {
 
     @Test
     public void test3() {
-        String str = "{"
+        // 从数据库中读取到一个String
+        String originStr = "{"
                 + "\"parameter\":{"
                 + "\"lineDelimiter\": \"a\\\\nb\""
                 + "}"
                 + "}";
-        JSONObject object = JSON.parseObject(str);
-        System.out.println("str=" + str);
-        String objectStr = object.toString();
-        System.out.println("object=" + object.toString());
-        JSONObject parameter = object.getJSONObject("parameter");
-        String espaceDelimiter = parameter.getString("lineDelimiter");
-        System.out.println("get result: " + espaceDelimiter);
+        // 在Java中转化为JSON Object
+        JSONObject jsonObject = JSON.parseObject(originStr);
+        System.out.println("origin str=" + originStr); // 这里看到的是数据库中select看到的值
+        String jsonStr = jsonObject.toString();
+        System.out.println("json object=" + jsonStr); // 可见，与origin str没有变化
 
-        String originDelimiter = StringEscapeUtils.escapeJava(espaceDelimiter);
-        System.out.println("escape: " + originDelimiter);
+        JSONObject parameter = jsonObject.getJSONObject("parameter");
+        String lineDelimiter = parameter.getString("lineDelimiter");
+        System.out.println("get result: " + lineDelimiter); // 这里会丢失反斜杠
 
-        String newDelimiter = originDelimiter.replace("\\\\", "\\");
+        String escapeDelimiter = StringEscapeUtils.escapeJava(lineDelimiter);
+        System.out.println("escape: " + escapeDelimiter); // 这里会把反斜杠添加回去
+
+        String newDelimiter = escapeDelimiter.replace("\\\\", "\\");
 
         if (parameter.containsKey("lineDelimiter")) {
-            String originValue = "\"lineDelimiter\":\"" + originDelimiter + "\"";
+            String originValue = "\"lineDelimiter\":\"" + escapeDelimiter + "\"";
             String newValue = "\"lineDelimiter\":\"" + newDelimiter + "\"";
             String newParam = parameter.toString().replace(originValue, newValue);
-            object.put("parameter", JSON.parseObject(newParam));
+            jsonObject.put("parameter", JSON.parseObject(newParam));
         } else {
             System.out.println("没有lineDelimiter");
         }
 
-        System.out.println(object.toString());
-        System.out.println("after:" + object.getJSONObject("parameter").getString("lineDelimiter"));
-        System.out.println("after:" + StringEscapeUtils.escapeJava(object.getJSONObject("parameter").getString("lineDelimiter")));
+        System.out.println(jsonObject.toString());
+        System.out.println("after:" + jsonObject.getJSONObject("parameter").getString("lineDelimiter"));
+        System.out.println("after:" + StringEscapeUtils.escapeJava(jsonObject.getJSONObject("parameter").getString("lineDelimiter")));
     }
 
     @Test
@@ -191,7 +192,7 @@ public class TestUrl {
     }
 
     @Test
-    public void test6(){
+    public void test6() {
         String a = "\\n";
         System.out.println(a); // \n
         String b = StringEscapeUtils.escapeJava(a);
@@ -200,43 +201,47 @@ public class TestUrl {
         //System.out.println(StringUtils.escapeQuote(a,"\\"));// \\n
 
         System.out.println(StringEscapeUtils.unescapeJava(b));
-
     }
 
     @Test
-    public void test7(){
-        String str = "{"
+    public void test7() {
+        // 从数据库中读取到一个String
+        String originStr = "{"
                 + "\"parameter\":{"
                 + "\"lineDelimiter\": \"a\\\\nb\""
                 + "}"
                 + "}";
-        JSONObject object = JSON.parseObject(str);
-        System.out.println("str=" + str);
-        System.out.println(str.length());
-        String objectStr = object.toString();
-        System.out.println("object=" + object.toString());// \\n
-        System.out.println(object.toString().length());
-        JSONObject parameter = object.getJSONObject("parameter");
-        String espaceDelimiter = parameter.getString("lineDelimiter");// \n
-        System.out.println("get result: " + espaceDelimiter); // \n
+        // 在Java中转化为JSON Object
+        JSONObject jsonObject = JSON.parseObject(originStr);
+        System.out.println("origin str = " + originStr);// 输出\\n  这里看到的是数据库中select看到的值
+        System.out.println("origin str length = " + originStr.length()); // 40
+        System.out.println("json object str = " + jsonObject.toString());// 输出\\n  可见，与origin str没有变化
+        System.out.println("json object str length = " + jsonObject.toString().length()); // 39
 
-        String newLineDelimiter = StringEscapeUtils.unescapeJava(espaceDelimiter);
-        //String originDelimiter = StringEscapeUtils.escapeJava();
+        JSONObject parameter = jsonObject.getJSONObject("parameter");
+        String lineDelimiter = parameter.getString("lineDelimiter");
+        System.out.println("get result: " + lineDelimiter); // 输出\n  这里会丢失反斜杠
 
-        parameter.put("lineDelimiter", newLineDelimiter);
-        //parameter.put("lineDelimiter2",newLineDelimiter);
-        System.out.println(object.toString());
-        System.out.println(object.toString().length());
+        String unescapeDelimiter = StringEscapeUtils.unescapeJava(lineDelimiter);
+        System.out.println("unescape str = " + unescapeDelimiter); // 输出 a换行b，即\n会被标准输出
+        //String espaceDelimiter = StringEscapeUtils.escapeJava(lineDelimiter);
+        //System.out.println("espace str = " + espaceDelimiter); // 输出a\\nb，即\\n会被原封不动地输出
 
+        parameter.put("lineDelimiter", unescapeDelimiter); // 这里会修改JSON Object
+        //parameter.put("lineDelimiter2", espaceDelimiter);
 
+        // 再次打印JSON Object，即变更后的JSON Object
+        System.out.println("json object str = " + jsonObject.toString()); // 输出\n，即这里会将\n正确写回JSON Object
+        System.out.println("json object str length = " + jsonObject.toString().length()); // 38
     }
+
     @Test
-    public void test8(){
-        String a= String.format("abc:%s", "aa\\n\\\\b");
+    public void test8() {
+        String a = String.format("abc:%s", "aa\\n\\\\b");
         System.out.println(a);
         System.out.println(StringEscapeUtils.escapeJava(a));
         Map<String, String> map = new HashMap<>();
-        map.put(a,a);
+        map.put(a, a);
         System.out.println(map);
     }
 }

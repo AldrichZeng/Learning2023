@@ -1,5 +1,11 @@
 package com.zy;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Scanner;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
@@ -8,6 +14,38 @@ import org.junit.Test;
  * @Date: 2023/9/10 11:54
  */
 public class StringTest {
+
+    @Test
+    public void testTime(){
+        Long timeInMillis = 1696767736467L;
+        Date date = new Date(timeInMillis);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        System.out.println(sdf.format(date));
+    }
+
+    @Test
+    public void testScanner() {
+        String lineDelimtier = "\\t";
+        Scanner scanner = new Scanner("1\t2\t");
+        Pattern pattern = Pattern.compile(lineDelimtier, Pattern.LITERAL);
+        scanner.useDelimiter(pattern);
+        while (scanner.hasNext()) {
+            System.out.println("output:" + scanner.nextInt());
+        }
+    }
+
+    @Test
+    public void testEscape() {
+        String lineDelimiter = "\\n";
+        String escapeJava = StringEscapeUtils.escapeJava(lineDelimiter);
+        System.out.println("origin:" + escapeJava);
+        if (StringUtils.contains(escapeJava, "\\\\")) {
+            System.out.println("true");
+        }
+        String unescape = StringEscapeUtils.unescapeJava(lineDelimiter);
+        System.out.println(StringEscapeUtils.escapeJava(unescape));
+        System.out.println("end");
+    }
 
     @Test
     public void test() {
