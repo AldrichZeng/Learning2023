@@ -1,0 +1,11 @@
+{
+  "envType": "PRD",
+  "taskAuthType": "PROJECT",
+  "project": "jc_odps_dev",
+  "region": "cn-shanghai",
+  "projectCreateOption": {
+    "mode": "SHARE",
+    "odpsTypeMode": "STANDARD",
+    "resourceGroupName": "quota"
+  }
+}

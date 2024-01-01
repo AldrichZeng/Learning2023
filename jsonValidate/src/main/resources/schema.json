@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "envType": {
+      "type": "string",
+      "pattern": "^(DEV|PRD)$",
+      "description": "生产环境(PRD)或开发环境(DEV)，仅允许匹配DEV、PRD"
+    },
+    "taskAuthType": {
+      "type": "string",
+      "description": "访问身份",
+      "enum": [
+        "STS_ROLE",
+        "PROJECT",
+        "SUBACCOUNT",
+        "USER",
+        "AK"
+      ]
+    },
+    "taskSubmitter": {
+      "type": "string",
+      "description": "子账号或RAM角色"
+    },
+    "project": {
+      "type": "string",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
+      "description": "MC项目名"
+    },
+    "endpoint": {
+      "type": "string",
+      "description": "MaxCompute Endpoint"
+    },
+    "tunnelEndpoint": {
+      "type": "string",
+      "description": "Tunnel Endpoint"
+    },
+    "region": {
+      "type": "string",
+      "description": "地域"
+    },
+    "acrossOwnerId": {
+      "type": "string",
+      "description": "对方阿里云主账号ID"
+    },
+    "accessId": {
+      "type": "string",
+      "description": "使用AK方式认证时，填写AccessId"
+    },
+    "accessKey": {
+      "type": "string",
+      "description": "使用AK方式认证时，填写AccessKey"
+    },
+    "projectCreateOption": {
+      "properties": {
+        "mode": {
+          "type": "string",
+          "default": "SHARE",
+          "description": "付费方式"
+        },
+        "resourceGroupName": {
+          "type": "string",
+          "description": "Quota组"
+        },
+        "odpsTypeMode": {
+          "type": "string",
+          "description": "数据类型",
+          "default": "STANDARD"
+        },
+        "encryptProperties": {
+          "properties": {
+            "encryptKey": {
+              "type": "string",
+              "description": "密钥"
+            },
+            "encryptAlgorithm": {
+              "type": "string",
+              "description": "加密算法"
+            }
+          },
+          "required": [
+            "encryptKey",
+            "encryptAlgorithm"
+          ]
+        }
+      },
+      "required": [
+        "mode",
+        "odpsTypeMode",
+        "resourceGroupName"
+      ]
+    }
+  },
+  "required": [
+    "envType",
+    "taskAuthType",
+    "project",
+    "region"
+  ]
+}
