@@ -1,6 +1,5 @@
 package com.example.pgjdbc;
 
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -9,6 +8,7 @@ import java.sql.ResultSetMetaData;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,24 +19,25 @@ import org.slf4j.LoggerFactory;
 public class PolarDB {
     private static final Logger logger = LoggerFactory.getLogger(PolarDB.class);
 
-    public static void main(String[] args) {
-        // 设置RDS PostgreSQL实例的连接地址
-        String hostname = "pc-uf6834ro3065e495q-out.o.polardb.rds.aliyuncs.com";
-        //String hostname = "pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com";
-        // 设置RDS PostgreSQL实例的连接端口
-        String port = "1521";
-        //String port = "5432";
-        // 设置待连接的数据库名
-        //String dbname = "jctest";
-        String dbname = "jiangcheng";
+    // 设置RDS PostgreSQL实例的连接地址
+    static String hostname = "master-public.o.polardb.rds.aliyuncs.com";
+    // 设置RDS PostgreSQL实例的连接端口
+    static String port = "1521";
+    // 设置待连接的数据库名
+    static String dbname = "jiangcheng";
 
-        String jdbcUrl = "jdbc:postgresql://" + hostname + ":" + port + "/" + dbname;
+    static String username = "jiangcheng";
+    static String password = "DWzengyao123";
+
+    public static void main(String[] args) {
+
+        String jdbcUrl = "jdbc:polardb://" + hostname + ":" + port + "/" + dbname;
 
         Properties properties = getProperties(args);
         System.out.println(properties);
 
         try {
-            Class.forName("org.postgresql.Driver");
+            Class.forName("com.aliyun.polardb.Driver");
             Connection connection = DriverManager.getConnection(jdbcUrl, properties);
             //本示例中，假设在postgres数据库中存在表example，此处以查询表example数据为例。
             PreparedStatement preparedStatement = connection.prepareStatement("select * from " +
@@ -59,13 +60,14 @@ public class PolarDB {
     private static Properties getProperties(String[] args) {
         Properties properties = new Properties();
         // 设置连接数据库的用户名
-        //properties.setProperty("user", "jctest");
-        properties.setProperty("user", "jiangcheng");
+        properties.setProperty("user", username);
         //设置连接数据库的密码
-        //properties.setProperty("password", "DWzengyao1234");
-        properties.setProperty("password", "DWzengyao123");
+        properties.setProperty("password", password);
         // 设置证书存放路径
         //String path = "/Users/aldrichzeng/Downloads/ssl";
+
+        properties.setProperty("ssl", "true");
+        properties.setProperty("sslrootcert", "/Users/aldrichzeng/Downloads/ApsaraDB-CA-Chain (5)/ApsaraDB-CA-Chain.p7b");
 
         //if (args.length == 4) {
         //    // 配置以SSL访问
