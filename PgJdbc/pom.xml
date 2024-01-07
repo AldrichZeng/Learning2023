@@ -81,7 +81,11 @@
             <artifactId>commons-cli</artifactId>
             <version>1.2</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>polardb-jdbc18</artifactId>
+            <version>42.5.4.0.6</version>
+        </dependency>
     </dependencies>
 
     <build>

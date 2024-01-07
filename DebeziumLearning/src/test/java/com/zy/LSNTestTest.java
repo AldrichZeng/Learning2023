@@ -121,8 +121,8 @@ public class LSNTestTest {
 
     @Test
     public void test4() {
-        System.out.println(Lsn.valueOf("1AD/5C001C08").asLong());
-        System.out.println(Lsn.valueOf("1AD/63001E30").asLong());
+        System.out.println(Lsn.valueOf("1D2/F2001240").asLong());
+        System.out.println(Lsn.valueOf("1D2/F5000518").asLong());
         System.out.println(Lsn.valueOf("1AD/5C001C08").asLong() < Lsn.valueOf("1AD/63001E30").asLong());
         System.out.println(Lsn.valueOf("1AD/5C001C08").compareTo(Lsn.valueOf("1AD/63001E30")));
     }
