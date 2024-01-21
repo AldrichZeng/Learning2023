@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -12,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 
 import io.debezium.connector.postgresql.connection.Lsn;
 import org.apache.commons.lang3.StringUtils;
@@ -125,6 +130,24 @@ public class LSNTestTest {
         System.out.println(Lsn.valueOf("1D2/F5000518").asLong());
         System.out.println(Lsn.valueOf("1AD/5C001C08").asLong() < Lsn.valueOf("1AD/63001E30").asLong());
         System.out.println(Lsn.valueOf("1AD/5C001C08").compareTo(Lsn.valueOf("1AD/63001E30")));
+    }
+
+    @Test
+    public void test100(){
+        String a= "{\"jzms_test\":{\"mappings\":{\"_doc\":{\"properties\":{\"apiID\":{\"type\":\"keyword\"},\"appId\":{\"type\":\"keyword\"},\"appName\":{\"type\":\"text\"},\"id\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}},\"reportTime\":{\"type\":\"keyword\"},\"requestAppId\":{\"type\":\"keyword\"},\"requestAppName\":{\"type\":\"text\"},\"requestData\":{\"type\":\"text\"},\"resultId\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}},\"serviceID\":{\"type\":\"keyword\"},\"serviceStatusList\":{\"properties\":{\"requestAppId\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}},\"requestAppName\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}},\"requestData\":{\"properties\":{\"@type\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}},\"prefix\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}}}},\"serviceID\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}},\"startTime\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}}}},\"serviceType\":{\"type\":\"keyword\"},\"startTime\":{\"type\":\"keyword\"}}}}}}";
+        JSONObject x = JSON.parseObject(a);
+        System.out.println(x);
+    }
+
+    @Test
+    public void test101(){
+        Date currentDate = new Date(); // 获取当前日期和时间
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String formattedDate = formatter.format(currentDate);
+        System.out.println(formattedDate);
+        ZoneId zoneId = ZoneId.systemDefault(); // 这里将是通过JVM参数设置的时区
+        ZonedDateTime now = ZonedDateTime.now(zoneId);
+        System.out.println(now);
     }
 
     @Test
