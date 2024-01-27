@@ -20,7 +20,7 @@
 // * @Date: 2023/10/20 15:56
 // */
 //public class Main2 {
-//    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+//    private static final Logger logger = LoggerFactory.getLogger(com.zy.threadLocalLearning.Main.class);
 //
 //    public static void main(String[] args) {
 //        String url = "jdbc:postgresql://pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com:5432/jctest";
