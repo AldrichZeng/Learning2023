@@ -9,6 +9,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,8 +34,10 @@ public class PolarDB {
 
     static String username = "jiangcheng";
     static String password = "DWzengyao123";
+    static String sslrootcert = "/Users/aldrichzeng/Downloads/ApsaraDB-CA-Chain (5)/ApsaraDB-CA-Chain.pem";
 
     public static void main(String[] args) {
+        parseArgs(args);
 
         String jdbcUrl = "jdbc:polardb://" + hostname + ":" + port + "/" + dbname;
 
@@ -40,8 +48,7 @@ public class PolarDB {
             Class.forName("com.aliyun.polardb.Driver");
             Connection connection = DriverManager.getConnection(jdbcUrl, properties);
             //本示例中，假设在postgres数据库中存在表example，此处以查询表example数据为例。
-            PreparedStatement preparedStatement = connection.prepareStatement("select * from " +
-                    "public.oracle_test");
+            PreparedStatement preparedStatement = connection.prepareStatement("select * from public.oracle_test");
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 ResultSetMetaData rsmd = resultSet.getMetaData();
@@ -66,8 +73,11 @@ public class PolarDB {
         // 设置证书存放路径
         //String path = "/Users/aldrichzeng/Downloads/ssl";
 
-        properties.setProperty("ssl", "true");
-        properties.setProperty("sslrootcert", "/Users/aldrichzeng/Downloads/ApsaraDB-CA-Chain (5)/ApsaraDB-CA-Chain.p7b");
+        if (StringUtils.isNotBlank(sslrootcert)) {
+            properties.setProperty("ssl", "true");
+            properties.setProperty("sslmode", "verify-ca");
+            properties.setProperty("sslrootcert", sslrootcert);
+        }
 
         //if (args.length == 4) {
         //    // 配置以SSL访问
@@ -85,5 +95,55 @@ public class PolarDB {
         //}
 
         return properties;
+    }
+
+    public static void parseArgs(String[] args) {
+
+        Options options = new Options();
+        Option opt = new Option("h", "help", false, "Print help");
+        opt.setRequired(false);
+        options.addOption(opt);
+
+        opt = new Option("h", "host", true, "数据库地址");
+        opt.setRequired(true);
+        options.addOption(opt);
+
+        opt = new Option("P", "port", true, "端口");
+        opt.setRequired(true);
+        options.addOption(opt);
+
+        opt = new Option("d", "database", true, "数据库名");
+        opt.setRequired(true);
+        options.addOption(opt);
+
+        opt = new Option("p", "password", true, "密码");
+        opt.setRequired(true);
+        options.addOption(opt);
+
+        opt = new Option("u", "username", true, "用户名");
+        opt.setRequired(true);
+        options.addOption(opt);
+
+        opt = new Option("s", "sslrootcert", true, "证书存放位置");
+        opt.setRequired(false);
+        options.addOption(opt);
+
+        CommandLine commandLine = null;
+        CommandLineParser parser = new PosixParser();
+        try {
+            commandLine = parser.parse(options, args);
+            password = commandLine.getOptionValue("password");
+            username = commandLine.getOptionValue("username");
+            hostname = commandLine.getOptionValue("host");
+            port = commandLine.getOptionValue("port");
+            dbname = commandLine.getOptionValue("database");
+            System.out.println("parse successfully!");
+            System.out.println("hostname:" + hostname);
+            System.out.println("port:" + port);
+            System.out.println("dbname:" + dbname);
+            System.out.println("username:" + username);
+            System.out.println("password:" + password);
+        } catch (Exception e) {
+        }
     }
 }
