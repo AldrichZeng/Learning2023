@@ -8,7 +8,7 @@
         <module>DebeziumLearning</module>
         <module>PgBulkInsert</module>
         <module>UrlEncodeLearning</module>
-        <module>untitled</module>
+        <module>MyLearning</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
