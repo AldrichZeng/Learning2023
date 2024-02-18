@@ -42,8 +42,8 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.2.18</version>
-            <!--            <version>42.2.27</version>-->
+            <!--            <version>42.2.18</version>-->
+            <version>42.2.27</version>
         </dependency>
         <!--        添加SLF4j依赖-->
         <dependency>

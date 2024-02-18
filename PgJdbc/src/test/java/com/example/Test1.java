@@ -21,4 +21,13 @@ public class Test1 {
         list.clear();
         System.out.println(list.size());
     }
+
+    @Test
+    public void test2(){
+        String str = "${srcSchemaName}";
+        String key = "srcSchemaName";
+        String value = null;
+        str = str.replaceAll("\\$\\{" + key + "\\}", value);
+        System.out.println(str);
+    }
 }
