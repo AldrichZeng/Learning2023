@@ -9,7 +9,9 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.internal.verification.Times;
 
 /**
  * @author 匠承
@@ -19,7 +21,10 @@ public class Ex2 {
     /**
      * 实际时间是北京时间1899-01-01 00:00:00
      */
-    Long rawData = -2209017943000L;
+    long rawData = -2209017943000L;
+    //long rawData = -5364691543000L;
+    //long rawData = -5364691543000L;
+
 
     /**
      * 模拟DataX的时间处理过程。
@@ -31,12 +36,15 @@ public class Ex2 {
         // 这一步就出错了
         Date date = new Date(rawData);
         System.out.println(date.getTime());
+        System.out.println(TimeZone.getDefault());
         System.out.println("============");
         //TimeZone.setDefault(TimeZone.getTimeZone(ZoneId.of("America/New_York")));
         System.out.println(date);//Sat Dec 31 23:54:17 CST 1898
-        Long time = date.getTime();
-        Timestamp timestamp = new Timestamp(time);
+        Timestamp timestamp = new Timestamp(rawData);
+        System.out.println(timestamp.getTime());
         System.out.println(timestamp);//1898-12-31 23:54:17.0
+        Assert.assertEquals(rawData, date.getTime());
+        Assert.assertEquals(rawData, timestamp.getTime());
     }
 
     /**
@@ -71,18 +79,31 @@ public class Ex2 {
         Instant instant = Instant.ofEpochMilli(rawData);
         // 使用当前时区：Asia/Shanghai
         ZonedDateTime dateTime = instant.atZone(ZoneId.systemDefault());
-        System.out.println(dateTime);//1899-01-01T00:00+08:05:43[Asia/Shanghai]
-        System.out.println(Timestamp.valueOf(dateTime.toLocalDateTime()));//1899-01-01 00:00:00.0
+        System.out.println(dateTime);//1900-01-01T00:00+08:05:43[Asia/Shanghai]
+        System.out.println(Timestamp.from(dateTime.toInstant()));//1899-12-31 23:54:17.0
+        System.out.println(dateTime.getOffset());
+        System.out.println(Timestamp.valueOf(dateTime.toLocalDateTime()));//1900-01-01 00:00:00.0
+        System.out.println("===");
 
         // 使用America/New_York
         dateTime = instant.atZone(ZoneId.of("America/New_York"));
         System.out.println(dateTime);//1898-12-31T10:54:17-05:00[America/New_York]
+        System.out.println(Timestamp.from(dateTime.toInstant()));//用的是默认时区
+        System.out.println(dateTime.getOffset());
         System.out.println(Timestamp.valueOf(dateTime.toLocalDateTime()));//1898-12-31 10:54:17.0
+        System.out.println("===");
 
         // 使用UTC时区
         dateTime = instant.atZone(ZoneId.of(ZoneOffset.UTC.getId()));
         System.out.println(dateTime);//1898-12-31T15:54:17Z
+        System.out.println(Timestamp.from(dateTime.toInstant()));
+        System.out.println(dateTime.getOffset());
         System.out.println(Timestamp.valueOf(dateTime.toLocalDateTime()));//1898-12-31 15:54:17.0
+        System.out.println("===");
+
+        TimeZone.setDefault(TimeZone.getTimeZone("America/New_York"));
+        System.out.println(new Timestamp(rawData));
+
     }
 
     /**
