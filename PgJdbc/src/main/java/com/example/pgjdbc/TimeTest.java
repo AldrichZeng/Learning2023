@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
+import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +32,9 @@ public class TimeTest {
 
             PreparedStatement stmt = conn.prepareStatement(sql);
 
-            stmt.setInt(1, 7);
+            stmt.setInt(1, 6);
 
+            TimeZone.setDefault(TimeZone.getTimeZone("America/New_York"));
             Timestamp timestamp = new Timestamp(-2209017943000L);
             stmt.setTimestamp(2, timestamp);
 
