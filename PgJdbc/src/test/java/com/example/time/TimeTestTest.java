@@ -12,6 +12,9 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+
 import jdk.management.resource.internal.inst.WindowsAsynchronousServerSocketChannelImplRMHooks;
 import org.junit.Test;
 import org.mockito.internal.verification.Times;
@@ -63,6 +66,64 @@ public class TimeTestTest {
         System.out.println(millsOfDays);
         System.out.println(TimeZone.getDefault().getOffset(date.getTime()));
         System.out.println(new Date(millsOfDays - TimeZone.getDefault().getOffset(millsOfDays)));
+    }
+
+    @Test
+    public void test5(){
+        String regionId = "cn-beijing";
+        String region = regionId.replace("-","_");
+        System.out.println(region);
+    }
+
+    @Test
+    public void test6(){
+        String a = "[\"SYNC_STRUCT\",\"ONCE_OFFLINE\"]";
+        JSONArray b= JSON.parseArray(a);
+        System.out.println(b.get(0));
+        System.out.println(b.get(1));
+    }
+
+    @Test
+    public void test7(){
+        System.out.println(ZoneId.systemDefault().toString());
+    }
+
+
+    @Test
+    public void test8(){
+        A a = null;
+        change(a);
+        System.out.println(a);
+    }
+    private void change(A a){
+        a = new A();
+        a.setX("123");
+    }
+
+    public static class A {
+        private String x;
+        public void setX(String x){
+            this.x=x;
+        }
+        public String getX(){
+            return this.x;
+        }
+        @Override
+        public String toString(){
+            return "x = " + x;
+        }
+    }
+
+    @Test
+    public void test9(){
+        String s = String.format("%s.%s", "abc", null);
+        System.out.println(s);
+        System.out.println(s.length());
+    }
+
+    @Test
+    public void test10(){
+        System.out.println("4".compareTo("4")<=0);
     }
 
 
