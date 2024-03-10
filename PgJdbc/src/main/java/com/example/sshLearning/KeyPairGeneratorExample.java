@@ -53,9 +53,9 @@ public class KeyPairGeneratorExample {
                 "\n-----END PRIVATE KEY-----\n";
 
         // Save the keys to files
-        // 私钥
+        // 私钥写入文件
         Files.write(Paths.get("/Users/aldrichzeng/IdeaProjects/Learning2023/Learning2023/PgJdbc/private.key"), privateKeyPem.getBytes(StandardCharsets.UTF_8));
-        // 公钥
+        // 公钥直接打印
         System.out.println(encodePublicKey(publicKey, "zengyao"));
     }
 
