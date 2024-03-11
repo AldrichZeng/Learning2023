@@ -41,6 +41,9 @@ public class KeyPairGeneratorExample {
         generator.initialize(2048);
         KeyPair keyPair = generator.generateKeyPair();
 
+        System.out.println("generator.class = " + generator.getClass());
+        System.out.println("KeyPair.class = " + keyPair.getClass());
+
         // Get the private and public keys
         PrivateKey privateKey = keyPair.getPrivate();
         PublicKey publicKey = keyPair.getPublic();
@@ -54,6 +57,7 @@ public class KeyPairGeneratorExample {
 
         // Save the keys to files
         // 私钥写入文件
+        System.out.println(privateKeyPem);
         Files.write(Paths.get("/Users/aldrichzeng/IdeaProjects/Learning2023/Learning2023/PgJdbc/private.key"), privateKeyPem.getBytes(StandardCharsets.UTF_8));
         // 公钥直接打印
         System.out.println(encodePublicKey(publicKey, "zengyao"));
