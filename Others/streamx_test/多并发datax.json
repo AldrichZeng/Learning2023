@@ -1,0 +1,156 @@
+{
+  "job":
+  {
+    "setting":
+    {
+      "speed":
+      {
+        "channel": 10
+      }
+    },
+    "content":
+    [
+      {
+        "reader":
+        {
+          "name": "streamreader",
+          "parameter":
+          {
+            "column":
+            [
+              {
+                "type": "LONG",
+                "value": "10000000"
+              },
+              {
+                "dateFormat": "yyyy-MM-dd HH:mm:ss",
+                "type": "date",
+                "value": "2012-12-31 23:59:59"
+              },
+              {
+                "dateFormat": "yyyy-MM-dd HH:mm:ss",
+                "type": "date",
+                "value": "2012-12-31 23:59:59"
+              },
+              {
+                "dateFormat": "yyyy-MM-dd HH:mm:ss",
+                "type": "date",
+                "value": "2012-12-31 23:59:59"
+              },
+              {
+                "type": "bool",
+                "value": true
+              },
+              {
+                "type": "STRING",
+                "value": "abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789"
+              },
+              {
+                "type": "STRING",
+                "value": "abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789"
+              },
+              {
+                "type": "STRING",
+                "value": "abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789"
+              },
+              {
+                "type": "STRING",
+                "value": "abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789"
+              },
+              {
+                "type": "STRING",
+                "value": "abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789"
+              },
+              {
+                "type": "STRING",
+                "value": "abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789"
+              },
+              {
+                "type": "STRING",
+                "value": "abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789"
+              },
+              {
+                "type": "STRING",
+                "value": "abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789"
+              },
+              {
+                "type": "STRING",
+                "value": "abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789"
+              },
+              {
+                "type": "STRING",
+                "value": "abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789"
+              },
+              {
+                "type": "STRING",
+                "value": "abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789"
+              },
+              {
+                "type": "STRING",
+                "value": "abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789"
+              },
+              {
+                "type": "STRING",
+                "value": "abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789abcdefghij0123456789"
+              }
+            ],
+            "sliceRecordCount": "400"
+          }
+        },
+        "writer":
+        {
+          "name": "postgresqlwriter",
+          "parameter":
+          {
+            "authType": "authTypeNone",
+            "batchSize": 2048,
+            "password": "${pgPwd}",
+            "username": "${pgUser}",
+            "column":
+            [
+              "bigint_col",
+              "timestamp_col",
+              "time_col",
+              "date_col",
+              "bool_col",
+              "str1_col",
+              "str2_col",
+              "str3_col",
+              "str4_col",
+              "str5_col",
+              "str6_col",
+              "str7_col",
+              "str8_col",
+              "str9_col",
+              "str10_col",
+              "str11_col",
+              "str12_col",
+              "str13_col"
+            ],
+            "connection":
+            [
+              {
+                "authType": "authTypeNone",
+                "database": "${pgDb}",
+                "jdbcUrl": "jdbc:postgresql://${pgHost}:${pgPort}/${pgDb}",
+                "table":
+                [
+                  "${table}"
+                ]
+              }
+            ],
+            "encoding": "UTF-8",
+            "postSql":
+            [],
+            "preSql":
+            [],
+            "subType": "",
+            "tag": "public",
+            "type": "postgresql",
+            "writeMode": "insert"
+          }
+        }
+      }
+    ]
+  }
+}

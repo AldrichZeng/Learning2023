@@ -1,0 +1,158 @@
+{
+  "concurrent": 1,
+  "steps":
+  [
+    {
+      "stepType": "postgreslogicreplica",
+      "displayName": "reader",
+      "parameter":
+      {
+        "access": "Native",
+        "dbName": "${pgDb}",
+        "startTimestampMills": "${startTimestamp}",
+        "type": "postgresql",
+        "startPosition": "${startPosition}",
+        "slotName": "${pgSlot}",
+        "publicationName": "${pgPublication}",
+        "username": "${pgUser}",
+        "password": "${pgPwd}",
+        "port": "${pgPort}",
+        "connection":
+        [
+          {
+            "dbHost": "${pgHost}",
+            "jdbcUrl": "jdbc:postgresql://${pgHost}:${pgPort}/${pgDb}",
+            "username": "${pgUser}",
+            "password": "${pgPwd}",
+            "port": "${pgPort}",
+            "database":
+            [
+              {
+                "dbName": "${pgDb}",
+                "table":
+                [
+                  "public.test_performance_wide_1",
+                  "public.test_performance_wide_2",
+                  "public.test_performance_wide_3",
+                  "public.test_performance_wide_4",
+                  "public.test_performance_wide_5"
+                ]
+              }
+            ],
+            "instanceNetworkType": "VPC",
+            "tag": "rds",
+            "rdsOwnerId": "1624387842781448",
+            "table":
+            [
+              "public.test_performance_wide_1",
+              "public.test_performance_wide_2",
+              "public.test_performance_wide_3",
+              "public.test_performance_wide_4",
+              "public.test_performance_wide_5"
+            ],
+            "displayName": "性能测试专用-大规格",
+            "ownerId": "1624387842781448",
+            "datasourceType": "rds",
+            "databaseType": "postgresql",
+            "datasource": "postgresql"
+          }
+        ],
+        "table":
+        [
+          "public.test_performance_wide_1",
+          "public.test_performance_wide_2",
+          "public.test_performance_wide_3",
+          "public.test_performance_wide_4",
+          "public.test_performance_wide_5"
+        ],
+        "heartbeatIntervalMs": 600000,
+        "windowSizeMs": 7200000,
+        "windowIntervalMs": 300000,
+        "column":
+        [
+          "*"
+        ],
+        "timeZone": "Asia/Shanghai",
+        "pkInfo":
+        {
+          "public.test_performance":
+          [
+            "id"
+          ]
+        },
+        "recordQueueCapacity": 10000,
+        "isUserDefinePosition": true,
+        "datasourceType": "postgresql",
+        "enableDdl": true,
+        "parseDdl": true,
+        "datasource": "postgresql",
+        "name": "postgresql"
+      },
+      "name": "reader",
+      "category": "reader"
+    },
+    {
+      "stepType": "stream",
+      "parameter":
+      {
+        "print": true,
+        "path": "${homeDir}/result",
+        "fileName": "output",
+        "fieldDelimiter": ",",
+        "tableMapping":
+        [
+          {
+            "srcTable": "test_performance_wide_1",
+            "dstTable": "test_performance_wide_1",
+            "srcDb": "${pgDb}",
+            "sharding": false
+          },
+          {
+            "srcTable": "test_performance_wide_2",
+            "dstTable": "test_performance_wide_2",
+            "srcDb": "${pgDb}",
+            "sharding": false
+          },
+          {
+            "srcTable": "test_performance_wide_3",
+            "dstTable": "test_performance_wide_3",
+            "srcDb": "${pgDb}",
+            "sharding": false
+          },
+          {
+            "srcTable": "test_performance_wide_4",
+            "dstTable": "test_performance_wide_4",
+            "srcDb": "${pgDb}",
+            "sharding": false
+          },
+          {
+            "srcTable": "test_performance_wide_5",
+            "dstTable": "test_performance_wide_5",
+            "srcDb": "${pgDb}",
+            "sharding": false
+          }
+        ]
+      },
+      "name": "streamwriter01",
+      "category": "writer"
+    }
+  ],
+  "order":
+  {
+    "hops":
+    [
+      {
+        "from": "reader",
+        "to": "streamwriter01"
+      }
+    ]
+  },
+  "setting":
+  {
+    "speed":
+    {
+      "readerConcurrent": 3,
+      "concurrent": 1
+    }
+  }
+}

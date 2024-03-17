@@ -1,0 +1,4 @@
+create table public.test_performance_wide_1(
+  id int primary key,
+  str_col varchar(100)
+)

@@ -1,6 +1,5 @@
 package com.example.pgjdbc;
 
-import com.alibaba.fastjson2.JSON;
 
 import org.junit.Test;
 
@@ -12,6 +11,11 @@ public class JsonTest2 {
     @Test
     public void test(){
 
+
+    }
+
+    @Test
+    public void test1(){
 
     }
 }
