@@ -82,4 +82,11 @@ public class JsonTest {
             System.out.println(str.replace("1", String.valueOf(i)));
         }
     }
+
+    @Test
+    public void test8() {
+        for (int i = 1; i <= 100; i++) {
+            System.out.println("drop table if exists public.test_performance_" + i + ";");
+        }
+    }
 }

@@ -3,9 +3,6 @@ package com.example.ssh;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -18,14 +15,8 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Random;
+import java.util.UUID;
 
-
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.junit.Test;
 
 /**
@@ -52,10 +43,9 @@ public class SshTest {
         System.out.println("Public Key: " + Base64.getEncoder().encodeToString(publicKey.getEncoded()));
         System.out.println("Private Key: " + Base64.getEncoder().encodeToString(privateKey.getEncoded()));
 
-        transferPrivateKey((RSAPrivateCrtKey)privateKey);
-        transferPublicKey((RSAPublicKey)publicKey);
+        transferPrivateKey((RSAPrivateCrtKey) privateKey);
+        transferPublicKey((RSAPublicKey) publicKey);
     }
-
 
     public static void transferPublicKey(RSAPublicKey rsapubkey) throws IOException, NoSuchAlgorithmException {
         byte[] n = rsapubkey.getModulus().toByteArray(); // Java is 2sC bigendian
@@ -63,9 +53,12 @@ public class SshTest {
         byte[] tag = "ssh-rsa".getBytes(); // charset very rarely matters here
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(os);
-        dos.writeInt(tag.length); dos.write(tag);
-        dos.writeInt(e.length); dos.write(e);
-        dos.writeInt(n.length); dos.write(n);
+        dos.writeInt(tag.length);
+        dos.write(tag);
+        dos.writeInt(e.length);
+        dos.write(e);
+        dos.writeInt(n.length);
+        dos.write(n);
         byte[] encoded = os.toByteArray();
         // now hash that (you don't really need Apache)
         // assuming SHA256-base64 (see below)
@@ -74,35 +67,49 @@ public class SshTest {
         String output = Base64.getEncoder().encodeToString(result);
         System.out.println(output);
     }
-    public static void transferPrivateKey(RSAPrivateCrtKey pkey){
+
+    public static void transferPrivateKey(RSAPrivateCrtKey pkey) {
 
         byte[] alg = "ssh-rsa".getBytes(), none = "none".getBytes();
         byte[] nbyt = pkey.getModulus().toByteArray(), ebyt = pkey.getPublicExponent().toByteArray();
         int rand = new Random().nextInt();
 
-        ByteBuffer pub = ByteBuffer.allocate(nbyt.length+50); // always enough, but not too much over
-        for( byte[] x : new byte[][]{alg,ebyt,nbyt} )
-        { pub.putInt(x.length); pub.put(x); }
+        ByteBuffer pub = ByteBuffer.allocate(nbyt.length + 50); // always enough, but not too much over
+        for (byte[] x : new byte[][]{alg, ebyt, nbyt}) {
+            pub.putInt(x.length);
+            pub.put(x);
+        }
 
-        ByteBuffer prv = ByteBuffer.allocate(nbyt.length*4+50); // ditto
-        prv.putInt(rand); prv.putInt(rand);
-        for( byte[] x : new byte[][]{alg,nbyt,ebyt,pkey.getPrivateExponent().toByteArray(),
-                pkey.getCrtCoefficient().toByteArray(),pkey.getPrimeP().toByteArray(),pkey.getPrimeQ().toByteArray()} )
-        { prv.putInt(x.length); prv.put(x); }
+        ByteBuffer prv = ByteBuffer.allocate(nbyt.length * 4 + 50); // ditto
+        prv.putInt(rand);
+        prv.putInt(rand);
+        for (byte[] x : new byte[][]{alg, nbyt, ebyt, pkey.getPrivateExponent().toByteArray(),
+                pkey.getCrtCoefficient().toByteArray(), pkey.getPrimeP().toByteArray(), pkey.getPrimeQ().toByteArray()}) {
+            prv.putInt(x.length);
+            prv.put(x);
+        }
         prv.putInt(0); // no comment
-        for( int i = 0; prv.position()%8 != 0; ) prv.put((byte)++i); // 8 apparently default? IDK
+        for (int i = 0; prv.position() % 8 != 0; ) {
+            prv.put((byte) ++i); // 8 apparently default? IDK
+        }
 
-        ByteBuffer all = ByteBuffer.allocate(100+pub.position()+prv.position()); // ditto
-        all.put("openssh-key-v1".getBytes()); all.put((byte)0);
-        all.putInt(none.length); all.put(none); // cipher
-        all.putInt(none.length); all.put(none); // pbkdf
-        all.putInt(0); all.putInt(1); // parms, count
-        all.putInt(pub.position()); all.put(pub.array(),0,pub.position());
-        all.putInt(prv.position()); all.put(prv.array(),0,prv.position());
-        byte[] result = Arrays.copyOf(all.array(),  all.position());
+        ByteBuffer all = ByteBuffer.allocate(100 + pub.position() + prv.position()); // ditto
+        all.put("openssh-key-v1".getBytes());
+        all.put((byte) 0);
+        all.putInt(none.length);
+        all.put(none); // cipher
+        all.putInt(none.length);
+        all.put(none); // pbkdf
+        all.putInt(0);
+        all.putInt(1); // parms, count
+        all.putInt(pub.position());
+        all.put(pub.array(), 0, pub.position());
+        all.putInt(prv.position());
+        all.put(prv.array(), 0, prv.position());
+        byte[] result = Arrays.copyOf(all.array(), all.position());
 
-        System.out.print ("-----BEGIN OPENSSH PRIVATE KEY-----\n"
-                + Base64.getMimeEncoder(68,"\n".getBytes()).encodeToString(result)
+        System.out.print("-----BEGIN OPENSSH PRIVATE KEY-----\n"
+                + Base64.getMimeEncoder(68, "\n".getBytes()).encodeToString(result)
                 + "\n-----END OPENSSH PRIVATE KEY-----\n");
     }
 
@@ -169,4 +176,15 @@ public class SshTest {
     //    return stringWriter.toString();
     //}
 
+    @Test
+    public void test() {
+        UUID randomUUID = UUID.randomUUID();
+        System.out.println("Random UUID: " + randomUUID.toString());
+        System.out.println(randomUUID.toString().length());
+    }
+
+    @Test
+    public void test100(){
+        System.out.println("ss_heels-106561-PROD-f3afe73b-fae1-4352-8e85-2bc0a3c4ae30.dataworks_generated_ssh_private_key".length());
+    }
 }
