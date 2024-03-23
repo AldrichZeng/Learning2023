@@ -29,7 +29,7 @@ public class Main {
 
     public static String initialPosition = "{\n"
             + "  \"enginePostions\": {\n"
-            + "    \"pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com_jctest_di_slot\": {\n"
+            + "  \"pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com_jctest_di_slot\": {\n"
             + "      \"sourceOffset\": {\n"
             + "        \"ts_usec\": 1689573489732000,\n"
             + "        \"lsn\": " + "1183688263824" + ",\n"

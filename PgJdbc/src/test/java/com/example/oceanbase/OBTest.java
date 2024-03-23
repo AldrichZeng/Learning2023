@@ -1,5 +1,12 @@
 package com.example.oceanbase;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -137,7 +144,7 @@ public class OBTest {
     }
 
     @Test
-    public void test7(){
+    public void test7() {
         String x = "{\n"
                 + "    \"errno\": 0,\n"
                 + "    \"msg\": \"success\",\n"
@@ -852,5 +859,46 @@ public class OBTest {
                 + "    }\n"
                 + "}";
         JSON.parse(x);
+    }
+
+    @Test
+    public void test100() {
+        List<String> inputs = new ArrayList<>();
+        inputs.add("\"public\".\"tableName\"");
+        inputs.add("\"public\".\"table.Name\"");
+        inputs.add("\"sche.ma\".\"tableName\"");
+        inputs.add("\"hello\".\"tableName\"");
+        Pattern pattern = Pattern.compile("\"([^\"]+)\"\\.\"([^\"]+)\"");
+        for (int i = 0; i < inputs.size(); i++) {
+            String input = inputs.get(i);
+            Matcher matcher = pattern.matcher(input);
+
+            if (matcher.matches()) {
+                System.out.println("Match found: " + input);
+                System.out.println(matcher.group(1));
+                System.out.println(matcher.group(2));
+            } else {
+                System.out.println("No match.");
+            }
+        }
+    }
+
+    @Test
+    public void test101(){
+        Timestamp timestamp = null;
+        Instant instant = timestamp.toInstant();
+    }
+
+    @Test
+    public void test02(){
+        Long rawData = null;
+        Instant instant = Instant.ofEpochMilli(rawData);
+    }
+
+    @Test
+    public void test03(){
+        Object data = null;
+        Long raw = (Long) data;
+        System.out.println(raw==null);
     }
 }
