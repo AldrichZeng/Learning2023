@@ -70,7 +70,7 @@ public class Main {
         props.setProperty("database.server.name", "pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com_jctest_di_slot");
         props.setProperty("publication.autocreate.mode", "filtered");
         // 从哪个位点开始读
-        props.setProperty("offset.initial.position.json", initialPosition);
+        //props.setProperty("offset.initial.position.json", initialPosition);
         props.setProperty("connector.class", "io.debezium.connector.postgresql.PostgresConnector");
         // 心跳机制
         //props.setProperty("heartbeat.interval.ms", "1000");

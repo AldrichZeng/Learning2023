@@ -3,6 +3,8 @@ package com.example;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.alibaba.fastjson.JSONObject;
+
 import org.junit.Test;
 
 /**
@@ -29,5 +31,23 @@ public class Test1 {
         String value = null;
         str = str.replaceAll("\\$\\{" + key + "\\}", value);
         System.out.println(str);
+    }
+
+    @Test
+    public void test3(){
+        JSONObject injectedResult = new JSONObject();
+        System.out.println(injectedResult);
+        injectedResult.put("a", "b");
+        System.out.println(injectedResult);
+        injectedResult.putAll(null);
+        System.out.println(injectedResult);
+
+    }
+
+    @Test
+    public void test4(){
+        for(int i=0;i<2000;i++){
+            System.out.println("create table test"+i+" (id int);");
+        }
     }
 }
