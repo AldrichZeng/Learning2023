@@ -14,7 +14,7 @@ import org.junit.Test;
 public class Test1 {
 
     @Test
-    public void test1(){
+    public void test1() {
         List<String> list = new ArrayList<>();
 
         list.add("abc");
@@ -25,7 +25,7 @@ public class Test1 {
     }
 
     @Test
-    public void test2(){
+    public void test2() {
         String str = "${srcSchemaName}";
         String key = "srcSchemaName";
         String value = null;
@@ -34,20 +34,27 @@ public class Test1 {
     }
 
     @Test
-    public void test3(){
+    public void test3() {
         JSONObject injectedResult = new JSONObject();
         System.out.println(injectedResult);
         injectedResult.put("a", "b");
         System.out.println(injectedResult);
         injectedResult.putAll(null);
         System.out.println(injectedResult);
-
     }
 
     @Test
-    public void test4(){
-        for(int i=0;i<2000;i++){
-            System.out.println("create table test"+i+" (id int);");
+    public void test4() {
+        for (int i = 0; i < 2000; i++) {
+            System.out.println("create table myschema.test" + i + " (id int primary key, col2 varchar(100));");
+        }
+    }
+
+    @Test
+    public void test5() {
+        for (int i = 1; i < 2000; i++) {
+            System.out.println("drop table test" + i + ";");
+            System.out.println("create table test" + i + " (id int primary key, col2 varchar(100));");
         }
     }
 }

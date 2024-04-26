@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.Statement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,21 +12,21 @@ import org.slf4j.LoggerFactory;
 /**
  * @Date: 2024/4/13 17:17
  */
-public class MySQL {
+public class TestArray {
 
     private static final Logger logger = LoggerFactory.getLogger(MySQL.class);
 
     /**
      * 测试实例：qa3账号，北京
      */
-    static String hostname = "rm-2ze7wko8u0pj13280oo.mysql.rds.aliyuncs.com";
+    static String hostname = "rm-2zeb4f2r403u3buspvo.mysql.rds.aliyuncs.com";
     // 设置RDS PostgreSQL实例的连接端口
     static String port = "3306";
     // 设置待连接的数据库名
     static String dbname = "jiangcheng";
     static String username = "jiangcheng";
     static String password = "DWzengyao123";
-    static String tableName = "test_bigint";
+    static String tableName = "test_array";
 
     public static void main(String[] args) {
 
@@ -37,26 +36,19 @@ public class MySQL {
             Class.forName("com.mysql.jdbc.Driver");
             Connection conn = DriverManager.getConnection(jdbcUrl, username, password);
 
-            Statement stmt = conn.createStatement();
-            String querySql = "select * from " + tableName + " where 1=2";
-            ResultSet resultSet = stmt.executeQuery(querySql);
+            PreparedStatement pstmt = conn.prepareStatement("select * from " + tableName + " where str_col in (?)");
+            pstmt.setArray(1, conn.createArrayOf("VARCHAR", new String[]{"abc", "xyz", "hello"}));
+            ResultSet resultSet = pstmt.executeQuery();
             ResultSetMetaData metaData = resultSet.getMetaData();
             for (int i = 0; i < metaData.getColumnCount(); i++) {
                 logger.info("columnName: {}, columnType: {},{}", metaData.getColumnName(i + 1), metaData.getColumnTypeName(i + 1), metaData.getColumnType(i + 1));
             }
-
-            //本示例中，假设在postgres数据库中存在表example，此处以查询表example数据为例。
-            String sql = "insert into " + tableName + " values (?,?)";
-
-            // 执行查询
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-
-            pstmt.setInt(1, 3);
-            //pstmt.setLong(2, 10000L);
-            pstmt.setString(2, "2000");
-
-            int res = pstmt.executeUpdate();
-            logger.info("update result: {}", res);
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String str_col = resultSet.getString("str_col");
+                logger.info("id = {}, str_col = {}", id, str_col);
+            }
+            resultSet.close();
             pstmt.close();
         } catch (Exception exception) {
             exception.printStackTrace();

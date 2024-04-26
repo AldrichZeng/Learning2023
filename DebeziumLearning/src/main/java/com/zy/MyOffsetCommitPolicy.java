@@ -20,10 +20,10 @@ public class MyOffsetCommitPolicy implements OffsetCommitPolicy {
         logger.info("numberOfMessagesSinceLastCommit: " + numberOfMessagesSinceLastCommit + "\ttimeSinceLastCommit: " + timeSinceLastCommit.getSeconds());
         // 定义超过多长时间则confirm LSN
         if (timeSinceLastCommit.getSeconds() > confirm_interval_second) {
-            logger.info("Do commit LSN");
+            logger.info("Do commit LSN\n========================");
             return true;
         } else {
-            logger.info("Do not commit LSN");
+            logger.info("Do not commit LSN\n========================");
             return false;
         }
     }

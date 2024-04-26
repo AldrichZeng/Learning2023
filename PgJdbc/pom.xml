@@ -71,11 +71,11 @@
             <version>2.0.28</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>com.alibaba</groupId>-->
-<!--            <artifactId>fastjson</artifactId>-->
-<!--            <version>1.1.46.sec10_noneautotype</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.alibaba</groupId>-->
+        <!--            <artifactId>fastjson</artifactId>-->
+        <!--            <version>1.1.46.sec10_noneautotype</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
@@ -91,15 +91,20 @@
             <artifactId>polardb-jdbc18</artifactId>
             <version>42.5.4.0.6</version>
         </dependency>
-        <dependency>
-            <groupId>com.aliyun</groupId>
-            <artifactId>aliyun-java-sdk-oceanbasepro</artifactId>
-            <version>1.1.7</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.aliyun</groupId>-->
+<!--            <artifactId>aliyun-java-sdk-oceanbasepro</artifactId>-->
+<!--            <version>1.1.7</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-core</artifactId>
             <version>4.5.6</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.31</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk18on -->
@@ -108,7 +113,16 @@
             <artifactId>bcprov-jdk18on</artifactId>
             <version>1.74</version>
         </dependency>
-
+<!--        <dependency>-->
+<!--            <groupId>com.alipay.oceanbase</groupId>-->
+<!--            <artifactId>oceanbase-connector-java</artifactId>-->
+<!--            <version>3.2.0</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.oceanbase</groupId>-->
+<!--            <artifactId>oceanbase-client</artifactId>-->
+<!--            <version>2.4.5</version>-->
+<!--        </dependency>-->
 
 
     </dependencies>

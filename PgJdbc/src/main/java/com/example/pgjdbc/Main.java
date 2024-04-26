@@ -2,7 +2,9 @@ package com.example.pgjdbc;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,14 +20,20 @@ import org.slf4j.LoggerFactory;
 /**
  * @author 匠承
  * @Date: 2023/4/15 14:27
+ * 该程序用来测试一个PostgreSQL的JDBC
  */
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
+    /**
+     * qa3账号，北京实例
+     */
+    static String url = "jdbc:postgresql://pgm-2ze71531tgr926f0bo.pg.rds.aliyuncs.com:5432/jiangcheng";
+    static String user = "jiangcheng";
+    static String password = "DWzengyao123";
+    static String tableName = "public.test1_3";
+
     public static void main(String[] args) {
-        String url = "jdbc:postgresql://pgm-uf6780sk00vfe752co.pg.rds.aliyuncs.com:5432/jctest";
-        String user = "jctest";
-        String password = "DWzengyao1234";
 
         try {
             // 加载驱动程序
@@ -34,15 +42,26 @@ public class Main {
             Connection conn = DriverManager.getConnection(url, user, password);
             logger.info("连接上了");
 
-            Thread1 thread1 = new Thread1(conn);
-            Thread2 thread2 = new Thread2(conn);
+            Statement stmt = conn.createStatement();
+            String querySql = "select * from " + tableName + " where 1=2";
+            ResultSet resultSet = stmt.executeQuery(querySql);
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            for (int i = 0; i < metaData.getColumnCount(); i++) {
+                logger.info("columnName: {}, columnType: {},{}", metaData.getColumnName(i + 1), metaData.getColumnTypeName(i + 1), metaData.getColumnType(i + 1));
+            }
+
+            //Thread1 thread1 = new Thread1(conn);
+            //Thread2 thread2 = new Thread2(conn);
+            InsertThread thread3 = new InsertThread(conn);
 
             ExecutorService executor = Executors.newFixedThreadPool(4);
 
-            Future<Boolean> future1 = executor.submit(thread1);
-            Future<Boolean> future2 = executor.submit(thread2);
-            future1.get();
-            future2.get();
+            //Future<Boolean> future1 = executor.submit(thread1);
+            //Future<Boolean> future2 = executor.submit(thread2);
+            Future<Boolean> future3 = executor.submit(thread3);
+            //future1.get();
+            //future2.get();
+            future3.get();
 
             logger.info("end");
 
@@ -51,6 +70,43 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("error");
+        }
+    }
+
+    public static class InsertThread implements Callable<Boolean> {
+
+        Connection conn;
+
+        public InsertThread(Connection connection) {
+            this.conn = connection;
+        }
+
+        @Override
+        public Boolean call() throws Exception {
+
+            //Thread.sleep(1000);
+            logger.info("thread1 start.");
+
+            String sql = "insert into " + tableName + " values (?,?)";
+
+            // 执行查询
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+
+            pstmt.setInt(1, 2);
+            /**
+             * 测试：对于PostgreSQL的BIGINT类型，使用setLong和setString具有什么不同？
+             * 1. 使用setLong，正确
+             * 2. 使用setString，报错：postgresql.util.PSQLException: ERROR: column "bigint_col" is of type bigint but expression is of type character varying
+             */
+            pstmt.setLong(2, 10000L);
+            //pstmt.setString(2, "2000L");
+            //pstmt.setString(2, "2000");
+
+            int res = pstmt.executeUpdate();
+            logger.info("update result: {}", res);
+            pstmt.close();
+
+            return true;
         }
     }
 

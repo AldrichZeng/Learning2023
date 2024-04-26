@@ -32,7 +32,7 @@
         <dependency>
             <groupId>io.debezium</groupId>
             <artifactId>debezium-connector-postgres</artifactId>
-            <version>1.8.1.Final</version>
+            <version>${version.debezium}</version>
         </dependency>
 
         <dependency>
@@ -70,7 +70,7 @@
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
-        <version.debezium>1.8.1.Final</version.debezium>
+        <version.debezium>1.9.7.Final</version.debezium>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
