@@ -4,12 +4,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
@@ -20,6 +23,8 @@ import com.alibaba.fastjson.JSONObject;
 
 import io.debezium.connector.postgresql.connection.Lsn;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
@@ -385,6 +390,26 @@ public class LSNTestTest {
         }
         return properties;
 
+    }
+    @Test
+    public void test0426(){
+        String jdbcUrl = "jdbc:mysql://abc:123,asdf:3306/mydb?useSSL=false&serverTimezone=UTC";
+        String cleanURI = StringUtils.trim(StringUtils.substringAfter(jdbcUrl, ":"));
+        System.out.println(cleanURI);
+        URI uri = URI.create(cleanURI);
+        System.out.println(uri.getPath());
+        System.out.println(uri.getHost());
+        System.out.println(uri.getPort());
+        String database = StringUtils.removeStart(uri.getPath(), "/");
+        System.out.println(database);
+        if (StringUtils.isEmpty(database) && StringUtils.isNotEmpty(uri.getQuery())) {
+            List<NameValuePair> parsedUrl = URLEncodedUtils.parse(uri.getQuery(), StandardCharsets.UTF_8);
+            for (NameValuePair nameValuePair : parsedUrl) {
+                if (StringUtils.equalsIgnoreCase(nameValuePair.getName(), "SCHEMA")) {
+                    database = nameValuePair.getValue();
+                }
+            }
+        }
     }
 
 }
