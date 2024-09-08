@@ -1,5 +1,11 @@
 package com.zy;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,7 +123,7 @@ public class MyTest {
         for (int i = 0; i < list.size(); i++) {
             Object value = list.get(i);
             System.out.println(value);
-            if (value instanceof JSONObject){
+            if (value instanceof JSONObject) {
                 String res = StringUtils.replace(value.toString(), "\"", "\\\"");
                 System.out.println(res);
             }
@@ -128,7 +134,7 @@ public class MyTest {
      * JSONArray中的空元素，被字符串打印出来的时候是显示为文本null
      */
     @Test
-    public void test6(){
+    public void test6() {
         String a = "[1,null,2]";
         List<Object> list = JSON.parseArray(a, Object.class);
         System.out.println(list);
@@ -139,6 +145,49 @@ public class MyTest {
         x.append("xyz").append(list.get(1)).append("y");
         System.out.println(x.toString());
     }
+
+    @Test
+    public void test7() {
+        String a = "萙\uE085\uD846\uDE6Cꙛ撢궘涏矤顃꤈쭁⧈\uD843\uDC09\uF051⳨ᢃ\uF2C3˛魯ῗ迕皓♱븣贾咧薨ᷲ";
+
+        System.out.println(a);
+
+        byte[] b = a.getBytes(StandardCharsets.UTF_8);
+
+        CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
+        try {
+            decoder.decode(java.nio.ByteBuffer.wrap(b));
+            System.out.println("true");
+        } catch (CharacterCodingException e) {
+            System.out.println("false");
+        }
+    }
+
+    @Test
+    public void test8() throws MalformedURLException {
+        URL url = new URL("file:/home/zengyao.zy/abc");
+        System.out.println(url.toString());
+        System.out.println(url.getPath());
+        System.out.println(url.getQuery());
+    }
+
+    @Test
+    public void test9() throws MalformedURLException {
+        URL url = new URL("/home/zengyao.zy/abc?a=b");
+        System.out.println(url.toString());
+        System.out.println(url.getPath());
+        System.out.println(url.getQuery());
+    }
+    @Test
+    public void test10(){
+        System.out.println(Thread.currentThread().getContextClassLoader().getClass().getName());
+    }
+
+    @Test
+    public void test11(){
+        URI uriOld = URI.create(jdbcUrlOld.substring(5));
+    }
 }
+
 
 

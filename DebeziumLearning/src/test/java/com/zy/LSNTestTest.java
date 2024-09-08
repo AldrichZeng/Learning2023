@@ -8,8 +8,14 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -19,9 +25,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import io.debezium.connector.postgresql.connection.Lsn;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -131,21 +147,23 @@ public class LSNTestTest {
 
     @Test
     public void test4() {
-        System.out.println(Lsn.valueOf("2A/FD0013E8").asLong());
+        System.out.println(Lsn.valueOf("36/15011638").asLong());
         System.out.println(Lsn.valueOf("2A/FF000F28").asLong());
         System.out.println(Lsn.valueOf("1AD/5C001C08").asLong() < Lsn.valueOf("1AD/63001E30").asLong());
         System.out.println(Lsn.valueOf("1AD/5C001C08").compareTo(Lsn.valueOf("1AD/63001E30")));
     }
 
     @Test
-    public void test100(){
-        String a= "{\"jzms_test\":{\"mappings\":{\"_doc\":{\"properties\":{\"apiID\":{\"type\":\"keyword\"},\"appId\":{\"type\":\"keyword\"},\"appName\":{\"type\":\"text\"},\"id\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}},\"reportTime\":{\"type\":\"keyword\"},\"requestAppId\":{\"type\":\"keyword\"},\"requestAppName\":{\"type\":\"text\"},\"requestData\":{\"type\":\"text\"},\"resultId\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}},\"serviceID\":{\"type\":\"keyword\"},\"serviceStatusList\":{\"properties\":{\"requestAppId\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}},\"requestAppName\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}},\"requestData\":{\"properties\":{\"@type\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}},\"prefix\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}}}},\"serviceID\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}},\"startTime\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}}}},\"serviceType\":{\"type\":\"keyword\"},\"startTime\":{\"type\":\"keyword\"}}}}}}";
+    public void test100() {
+        String a
+                = "{\"jzms_test\":{\"mappings\":{\"_doc\":{\"properties\":{\"apiID\":{\"type\":\"keyword\"},\"appId\":{\"type\":\"keyword\"},\"appName\":{\"type\":\"text\"},\"id\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}},\"reportTime\":{\"type\":\"keyword\"},\"requestAppId\":{\"type\":\"keyword\"},\"requestAppName\":{\"type\":\"text\"},\"requestData\":{\"type\":\"text\"},\"resultId\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}},\"serviceID\":{\"type\":\"keyword\"},\"serviceStatusList\":{\"properties\":{\"requestAppId\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}},\"requestAppName\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}},\"requestData\":{\"properties\":{\"@type\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}},\"prefix\":{\"type\":\"text\","
+                + "\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}}}},\"serviceID\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}},\"startTime\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\",\"ignore_above\":256}}}}},\"serviceType\":{\"type\":\"keyword\"},\"startTime\":{\"type\":\"keyword\"}}}}}}";
         JSONObject x = JSON.parseObject(a);
         System.out.println(x);
     }
 
     @Test
-    public void test101(){
+    public void test101() {
         Date currentDate = new Date(); // 获取当前日期和时间
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String formattedDate = formatter.format(currentDate);
@@ -202,12 +220,14 @@ public class LSNTestTest {
     @Test
     public void test3() {
         Lsn lsn = Lsn.valueOf(1892587408656L);
-        System.out.println(lsn.asString());
-        System.out.println(lsn.asLong());
+        //System.out.println(lsn.asString());
+        //System.out.println(lsn.asLong());
 
         lsn = Lsn.valueOf("112/AB001938");
         System.out.println(lsn.asLong());
         System.out.println(lsn.asString());
+
+        System.out.println(Long.parseLong("AB001938", 16));
     }
 
     @Test
@@ -269,9 +289,6 @@ public class LSNTestTest {
         System.out.println(jdbcUrl.substring(0, 35));
     }
 
-
-
-
     @Test
     public void test21() {
         String url = "";
@@ -312,12 +329,12 @@ public class LSNTestTest {
         if (database != null && !URL_PARAMETER.matcher(database).matches()) {
             System.out.println("invalid database in url: " + database);
         }
-        System.out.println("database:"+database);
-        System.out.println("properties:"+properties);
+        System.out.println("database:" + database);
+        System.out.println("properties:" + properties);
     }
 
     @Test
-    public void test22(){
+    public void test22() {
         String a = "abc:100,abc:100,abc,,,d";
         String[] hostAndPorts = a.split(",");
         for (int i = 0; i < hostAndPorts.length; i++) {
@@ -326,15 +343,10 @@ public class LSNTestTest {
         }
 
         String b = "a,,b,,c";
-
     }
 
-    private void parseHost(String hostAddressesString){
+    private void parseHost(String hostAddressesString) {
         String[] hostAndPorts = hostAddressesString.split(",");
-
-
-
-
 
         Pattern HOST_PATTERN = Pattern.compile("^[a-zA-Z0-9_\\-\\.:\\[\\],]+$");
         int portIndex = hostAddressesString.lastIndexOf(":");
@@ -373,7 +385,7 @@ public class LSNTestTest {
         }
     }
 
-    private Map<String, String> parseProperties(String urlParameters){
+    private Map<String, String> parseProperties(String urlParameters) {
         Map<String, String> properties = new HashMap<>();
         if (urlParameters != null && !urlParameters.isEmpty()) {
             String[] parameters = urlParameters.split("&");
@@ -389,10 +401,10 @@ public class LSNTestTest {
             }
         }
         return properties;
-
     }
+
     @Test
-    public void test0426(){
+    public void test0426() {
         String jdbcUrl = "jdbc:mysql://abc:123,asdf:3306/mydb?useSSL=false&serverTimezone=UTC";
         String cleanURI = StringUtils.trim(StringUtils.substringAfter(jdbcUrl, ":"));
         System.out.println(cleanURI);
@@ -412,4 +424,248 @@ public class LSNTestTest {
         }
     }
 
+    @Test
+    public void test51() {
+        String str = "15:49:34Z";
+        LocalDateTime localDateTime =
+                LocalDateTime.parse(
+                        str.replace("Z", "+00:00"));
+        long timestamp = localDateTime.toInstant(ZoneOffset.UTC).toEpochMilli();
+    }
+
+    @Test
+    public void test52() {
+        String str = "01:00:00Z";
+        LocalTime localTime = LocalTime.parse(str.replace("Z", ""));
+        System.out.println(localTime);
+        System.out.println(localTime.getNano());
+        System.out.println(localTime.getSecond());
+        System.out.println(localTime.atOffset(ZoneOffset.UTC));
+        OffsetTime time = localTime.atOffset(ZoneOffset.UTC);
+
+        System.out.println("===========");
+        LocalDate currentDate = LocalDate.now();
+        LocalDateTime localDateTime = LocalDateTime.of(currentDate, localTime);
+        long timestamp = localDateTime.toInstant(ZoneOffset.UTC).toEpochMilli();
+        timestamp = timestamp / 1000L * 1000L;
+
+        System.out.println(timestamp);
+        System.out.println(timestamp - LocalDateTime.of(currentDate, LocalTime.of(0, 0, 0)).toInstant(ZoneOffset.systemDefault().getRules().getOffset(localDateTime)).toEpochMilli());
+
+        System.out.println(ZoneOffset.systemDefault().getRules().getOffset(localDateTime));
+    }
+
+    @Test
+    public void test53() {
+        String str = "{\n"
+                + "    \"a\": \"123\",\n"
+                + "    \"b\": \"456\",\n"
+                + "    \"c\":\"123\"\n"
+                + "}";
+
+        JSONObject obj = JSONObject.parseObject(str);
+        TT tt = obj.toJavaObject(TT.class);
+        System.out.println(tt);
+    }
+
+    @Test
+    public void test54() throws JsonProcessingException {
+        //String str = "{\n"
+        //        + "    \"a\": \"123\",\n"
+        //        + "    \"b\": \"456\",\n"
+        //        + "    \"c\":\"123\"\n"
+        //        + "}";
+
+        //String str = "{\n"
+        //        + "    \"a\": \"123\",\n"
+        //        + "    \"b\": \"456\""
+        //        + "}";
+
+        String str = "{\n"
+                + "    \"a\": \"123\""
+                + "}";
+
+        JSONObject obj = JSONObject.parseObject(str);
+        ObjectMapper mapper = new ObjectMapper();
+
+        //mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
+        mapper.addHandler(new DeserializationProblemHandler() {
+            @Override
+            public boolean handleUnknownProperty(DeserializationContext ctxt, JsonParser p, JsonDeserializer<?> deserializer, Object beanOrClass, String propertyName) throws IOException {
+                // 当遇到未知属性时，抛出自定义异常
+                throw new RuntimeException("Unknown property '" + propertyName + "' found in JSON for object of type " + beanOrClass.getClass().getName());
+            }
+        });
+        JsonNode node = mapper.readTree(obj.toString());
+
+        TT tt = mapper.treeToValue(node, TT.class);
+        System.out.println(tt);
+    }
+
+    @Data
+    public static class TT {
+        String a;
+        String b;
+        List<Item> list;
+
+        @Data
+        public static class Item {
+            String x;
+            String y;
+        }
+    }
+
+    @Test
+    public void test55() throws JsonProcessingException {
+        String str = "{\n"
+                + "    \"a\": \"aaa\",\n"
+                + "    \"b\": \"bbb\",\n"
+                + "    \"list\":\n"
+                + "    [\n"
+                + "        {\n"
+                + "            \"x\": \"xxx\",\n"
+                + "            \"y\": \"yyy\"\n"
+                + "        }\n"
+                + "    ]\n"
+                + "}";
+
+        JSONObject obj = JSONObject.parseObject(str);
+        ObjectMapper mapper = new ObjectMapper();
+
+        //mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
+        mapper.addHandler(new DeserializationProblemHandler() {
+            @Override
+            public boolean handleUnknownProperty(DeserializationContext ctxt, JsonParser p, JsonDeserializer<?> deserializer, Object beanOrClass, String propertyName) throws IOException {
+                // 当遇到未知属性时，抛出自定义异常
+                throw new RuntimeException("Unknown property '" + propertyName + "' found in JSON for object of type " + beanOrClass.getClass().getName());
+            }
+        });
+        JsonNode node = mapper.readTree(obj.toString());
+
+        TT tt = mapper.treeToValue(node, TT.class);
+        System.out.println(tt);
+    }
+
+    @Test
+    public void test56() {
+        A a = new A();
+        a.setMessage("hello");
+        System.out.println(a);
+
+        //System.out.println(JSON.toJSONString(a, SerializerFeature.BrowserCompatible));
+        System.out.println(JSONObject.parseObject(JSON.toJSONString(a)));
+    }
+
+    public static class A {
+        @JSONField(name = "Message")
+        String Message;
+
+        public String getMessage() {
+            return Message;
+        }
+
+        public void setMessage(String message) {
+            Message = message;
+        }
+    }
+
+    @Test
+    public void test57() {
+        String jdbcUrl = "jdbc:mysql://127.0.0.1:3306/db?a=b";
+        URI uri = URI.create(jdbcUrl.substring(5));
+        System.out.println(uri);
+        System.out.println(uri.getHost());
+        System.out.println(uri.getPort());// 3306
+        System.out.println(uri.getPath());//  /db
+        System.out.println(uri.getQuery());// a=b
+    }
+
+    @Test
+    public void test58() {
+        String jdbcUrl = "jdbc:mysql://127.0.0.1:3306,127.0.0.2:3307/db?a=b";
+        URI uri = URI.create(jdbcUrl.substring(5));
+        System.out.println(uri);
+        System.out.println(uri.getHost());
+        System.out.println(uri.getPort());// -1
+        System.out.println(uri.getHost() == null);
+        System.out.println(uri.getPath());//  /db
+        System.out.println(uri.getQuery());// a=b
+        System.out.println(uri.getRawPath());
+        System.out.println(uri.getScheme());
+
+        System.out.println(jdbcUrl.substring(0, jdbcUrl.lastIndexOf(uri.getPath())));
+    }
+
+    @Test
+    public void test59() {
+        String jdbcUrl = "jdbc:oracle:thin:@host:port:SID";
+        URI uri = URI.create(jdbcUrl.substring(5));
+        System.out.println(uri);
+        System.out.println(uri.getHost());
+        System.out.println(uri.getPort());// -1
+        System.out.println(uri.getPath());//  /db
+        System.out.println(uri.getQuery());// a=b
+        System.out.println(uri.getRawPath());
+        System.out.println(uri.getScheme());
+
+        System.out.println(uri.getPath() == null);
+
+        System.out.println(jdbcUrl.substring(0, jdbcUrl.lastIndexOf(uri.getPath())));
+    }
+
+    @Test
+    public void test60() {
+        String a = "{\n"
+                + "\t\"a\":\"122\",\n"
+                + "\t\"b\":\"144\",\n"
+                + "\t\"y\":\"y\"\n"
+                + "}";
+
+        X x = JSONObject.toJavaObject(JSON.parseObject(a), X.class);
+        System.out.println(x.toString());
+
+    }
+
+    @Data
+    public static class X {
+        String a;
+        String b;
+        Y y;
+    }
+
+    public static enum Y {
+        y("yy");
+        private String str;
+
+        Y(String str) {
+            this.str = str;
+        }
+    }
+
+    @Test
+    public void test61(){
+        JSONObject obj = JSONObject.parseObject("{\n"
+                + "    \"address\":\n"
+                + "    [\n"
+                + "        {\n"
+                + "            \"host\": \"127.0.0.1\",\n"
+                + "            \"port\": \"3306\"\n"
+                + "        }\n"
+                + "    ]\n"
+                + "}");
+        JSONArray jsonArray = obj.getJSONArray("address");
+        List<Address> res = jsonArray.toJavaList(Address.class);
+        System.out.println(res);
+
+        JSONObject x = new JSONObject();
+        x.put("add", res);
+        System.out.println(x);
+
+    }
+
+    @Data
+    public static class Address{
+        String host;
+        String port;
+    }
 }
