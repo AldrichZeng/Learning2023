@@ -183,10 +183,6 @@ public class MyTest {
         System.out.println(Thread.currentThread().getContextClassLoader().getClass().getName());
     }
 
-    @Test
-    public void test11(){
-        URI uriOld = URI.create(jdbcUrlOld.substring(5));
-    }
 }
 
 
