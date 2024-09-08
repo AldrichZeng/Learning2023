@@ -1,0 +1,8 @@
+{
+  "host": "pgm-2zeq52610w1u255hpo.pg.rds.aliyuncs.com",
+  "port": "5432",
+  "database": "jiangcheng",
+  "descrption": "北京qa3账号的实例，使用外网地址",
+  "username": "jiangcheng",
+  "password": "DWzengyao123"
+}
