@@ -1,13 +1,19 @@
 package com.zy;
 
+import java.sql.Array;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
+
+
 
 /**
  * @author 匠承
@@ -102,5 +108,26 @@ public class StringTest {
             sb.append("public.bigschema").append(i).append(",");
         }
         System.out.println(sb.toString());
+    }
+
+    @Test
+    public void test7(){
+        List<String> list = new ArrayList<String>(){
+            {
+                add("a");
+                add("b");
+                add("c");
+            }
+        };
+        System.out.println(list);
+        Collections.shuffle(list);
+        System.out.println(list);
+        Collections.shuffle(list);
+        System.out.println(list);
+        Collections.shuffle(list);
+        System.out.println(list);
+        Collections.shuffle(list);
+        System.out.println(list);
+
     }
 }
