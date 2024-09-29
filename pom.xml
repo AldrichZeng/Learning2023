@@ -10,6 +10,7 @@
         <module>UrlEncodeLearning</module>
         <module>MyLearning</module>
         <module>FlinkCdc</module>
+        <module>jschTest</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
