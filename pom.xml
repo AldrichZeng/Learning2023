@@ -11,6 +11,7 @@
         <module>MyLearning</module>
         <module>FlinkCdc</module>
         <module>jschTest</module>
+        <module>shiroLearning</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
