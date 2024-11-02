@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import com.aliyun.dataworks_public20200518.models.CreateResourceFileAdvanceRequest;
+import com.aliyun.dataworks_public20200518.models.CreateResourceFileRequest;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import static com.example.Cmd.jdbcUrl;
@@ -39,5 +42,12 @@ public class Update {
 
         update.close();
         conn.close();
+
+
+        CreateResourceFileRequest request = new CreateResourceFileRequest();
+
+        //
+        CreateResourceFileAdvanceRequest re2 = new CreateResourceFileAdvanceRequest();
+
     }
 }
