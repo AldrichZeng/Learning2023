@@ -1,5 +1,7 @@
 package com.example.springlearning.controller;
 
+import java.util.Date;
+
 import com.example.springlearning.annotation.Hello;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,10 +15,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class AopController {
 
-    @Hello(myName = true)
     @RequestMapping(value = "/aoptest", method = RequestMethod.GET)
-    public void test(@RequestParam(value = "input", required = false) String input) {
+    public Date test(@RequestParam(value = "input", required = false) String input) {
 
         System.out.println("in test, where input is " + input);
+        test2(input);
+        return new Date();
+    }
+
+    @Hello(myName = true)
+    public String test2(String input) {
+        System.out.println("test input");
+        return "abc";
     }
 }

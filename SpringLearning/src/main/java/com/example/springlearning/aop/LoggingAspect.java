@@ -1,9 +1,13 @@
 package com.example.springlearning.aop;
 
+import java.lang.reflect.Method;
+import java.util.Date;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,6 +29,13 @@ public class LoggingAspect {
         System.err.println("[Around] start " + pjp.getSignature());
         Object retVal = pjp.proceed();
         System.err.println("[Around] done " + pjp.getSignature());
-        return retVal;
+        Method method = ((MethodSignature) pjp.getSignature()).getMethod();
+        Class<?> returnType = method.getReturnType();
+        System.out.println("[Around] class: " + returnType);
+        if (returnType == Date.class) {
+            System.out.println("is date");
+        }
+
+        throw new RuntimeException("hello exception ");
     }
 }
