@@ -9,10 +9,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import io.debezium.connector.postgresql.PostgresOffsetContext;
-import io.debezium.connector.postgresql.SourceInfo;
-import io.debezium.connector.postgresql.connection.Lsn;
 import io.debezium.data.Envelope;
+import io.debezium.data.Envelope.FieldName;
 import io.debezium.embedded.Connect;
 import io.debezium.engine.ChangeEvent;
 import io.debezium.engine.DebeziumEngine;
@@ -123,36 +121,26 @@ public class MainSourceRecord {
 
         @Override
         public void handleBatch(List<ChangeEvent<SourceRecord, SourceRecord>> records, DebeziumEngine.RecordCommitter<ChangeEvent<SourceRecord, SourceRecord>> committer) throws InterruptedException {
-            int i = 0;
             for (ChangeEvent<SourceRecord, SourceRecord> record : records) {
-                logger.info("i = {}", i++);
-                //Function<ChangeEvent<SourceRecord, SourceRecord>, SourceRecord> from = (events) -> {
-                //    return ((EmbeddedEngineChangeEvent) events).sourceRecord();
-                //};
-                //SourceRecord rawRecord = from.apply(record);
-
-                logger.info("record: {}", record);
                 SourceRecord rawRecord = record.value();
-                logger.info("rawRecord: {}", rawRecord);
-                logger.info("rawRecord.value(): {}", rawRecord.value());
 
-                logger.info("rawRecord.sourceOffset: {}", rawRecord.sourceOffset());
-                logger.info("lsn = {}, lsn_proc = {}, lsn_commit = {}", Lsn.valueOf((Long) (rawRecord.sourceOffset().get(SourceInfo.LSN_KEY))), Lsn.valueOf((Long) (rawRecord.sourceOffset().get("lsn_proc"))), Lsn.valueOf((Long) (rawRecord.sourceOffset().get(PostgresOffsetContext.LAST_COMMIT_LSN_KEY))));
-                logger.info("rawRecord.sourcePartition: {}", rawRecord.sourcePartition());
                 Envelope.Operation op = null;
                 if (rawRecord.value() != null) {
                     op = Envelope.operationFor(rawRecord);
                 }
-                logger.info("op: {}", op);
+                //logger.info("op: {}", op);
                 if (op == null) {
-                    logger.info("it is heartbeat");
-                } else{
+                    //logger.info("it is heartbeat");
+                } else {
                     Struct value = (Struct) rawRecord.value();
-                    logger.info("rawRecord.value().schema.fields(): {}", value.getStruct(Envelope.FieldName.AFTER).schema().fields());
+                    logger.info("from schema: {}, table: {}", value.getStruct(FieldName.SOURCE).getString("schema"), value.getStruct(FieldName.SOURCE).getString("table"));
+
+                    logger.info("value: {}", value.getStruct(FieldName.AFTER));
+                    logger.info("========================");
                 }
                 countRecord++;
-                logger.info("countRecord = {}", countRecord);
-                logger.info("========================");
+                //logger.info("countRecord = {}", countRecord);
+                //logger.info("========================");
 
                 committer.markProcessed(record);
             }
